@@ -1,0 +1,40 @@
+services:
+  db:
+    image: postgres:13
+    container_name: summit_telemetry_db
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - "${POSTGRES_PORT}:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  app:
+    build: .
+    container_name: summit_telemetry_app
+    depends_on:
+      - db
+    env_file:
+      - .env
+    environment:
+      DISPLAY: ${DISPLAY:-}
+      QT_X11_NO_MITSHM: "1"
+    volumes:
+      - .:/app
+      - /tmp/.X11-unix:/tmp/.X11-unix:rw
+    command:
+      - ./build/telemetry_analyzer
+      - --input
+      - data/sample_telemetry.csv
+      - --postgres
+      - host=db port=5432 dbname=${POSTGRES_DB} user=${POSTGRES_USER} password=${POSTGRES_PASSWORD}
+      - --algorithm
+      - all
+
+volumes:
+  postgres_data:

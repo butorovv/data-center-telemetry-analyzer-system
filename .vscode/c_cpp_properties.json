@@ -1,0 +1,22 @@
+{
+  "configurations": [
+    {
+      "name": "Qt MinGW",
+      "includePath": [
+        "${workspaceFolder}/include",
+        "${workspaceFolder}/src",
+        "${workspaceFolder}/build/telemetry_gui_autogen/include",
+        "C:/Qt/6.11.0/mingw_64/include",
+        "C:/Qt/6.11.0/mingw_64/include/QtCore",
+        "C:/Qt/6.11.0/mingw_64/include/QtGui",
+        "C:/Qt/6.11.0/mingw_64/include/QtWidgets",
+        "C:/Qt/6.11.0/mingw_64/include/QtCharts",
+        "C:/Qt/6.11.0/mingw_64/mkspecs/win32-g++"
+      ],
+      "compilerPath": "C:/Qt/Tools/mingw1310_64/bin/g++.exe",
+      "cppStandard": "c++17",
+      "intelliSenseMode": "windows-gcc-x64"
+    }
+  ],
+  "version": 4
+}
