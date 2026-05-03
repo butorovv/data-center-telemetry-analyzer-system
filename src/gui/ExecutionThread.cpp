@@ -31,13 +31,17 @@ void ExecutionThread::configureValidation(
     const QString& failuresPath,
     const QString& telemetryPath,
     const QString& locationsPath,
-    double anomalyThreshold)
+    const QString& validationAlgorithm,
+    double anomalyThreshold,
+    int windowMinutes)
 {
     task_ = Task::Validate1970187;
     failuresPath_ = failuresPath;
     validationTelemetryPath_ = telemetryPath;
     locationsPath_ = locationsPath;
+    validationAlgorithm_ = validationAlgorithm;
     anomalyThreshold_ = anomalyThreshold;
+    validationWindowMinutes_ = windowMinutes;
     cancellation_.reset();
 }
 
@@ -152,6 +156,8 @@ void ExecutionThread::runValidation()
     options.locationsPath = locationsPath_.toStdString();
     options.xidCode = 94;
     options.lookbackMinutes = 20;
+    options.validationWindowMinutes = validationWindowMinutes_;
+    options.validationAlgorithm = validationAlgorithm_.toStdString();
     options.anomalyThreshold = anomalyThreshold_;
     options.maxEvents = 0;
     options.cancellation = &cancellation_;
@@ -183,25 +189,41 @@ void ExecutionThread::runValidation()
         database_.saveResult(lastResult_, metrics, dataset_.rows.size());
     }
     emitResultRows(lastResult_);
-    emitChartPoints(lastResult_);
+    emitValidationChartPoints(validation.leadTimes);
+    const auto& summary = validation.summary;
+    emit logMessage(QStringLiteral("Validation algorithm: %1").arg(QString::fromStdString(summary.algorithm)));
+    emit logMessage(QStringLiteral("Validation window: %1; threshold=%2").arg(QString::fromStdString(summary.windowType)).arg(summary.threshold, 0, 'f', 4));
+    emit logMessage(QStringLiteral("Total rows: %1; is_failure == 1: %2; valid failures: %3; skipped failures: %4")
+        .arg(summary.totalRows).arg(summary.totalFailureRows).arg(summary.validFailureRows).arg(summary.skippedFailureRows));
+    emit logMessage(QStringLiteral("Skipped reasons: missing timestamp=%1, missing host/GPU=%2, missing features=%3, non-finite=%4")
+        .arg(summary.missingTimestamp).arg(summary.missingHostOrGpu).arg(summary.missingRequiredFeatures).arg(summary.nonFiniteNumericValues));
+    emit logMessage(QStringLiteral("Processed=%1; positive=%2; negative=%3; detection_rate=%4; lead_time_for_positive=%5 sec")
+        .arg(summary.processedEvents).arg(summary.positiveCount).arg(summary.negativeCount).arg(summary.detectionRate, 0, 'f', 4).arg(summary.leadTimeSeconds));
+    emit logMessage(QStringLiteral("Mean score: positive=%1; negative=%2; proxy_used=%3")
+        .arg(summary.meanScorePositive, 0, 'f', 4).arg(summary.meanScoreNegative, 0, 'f', 4).arg(summary.proxyUsed));
     for (const auto& item : validation.leadTimes) {
         emit leadTimeRow(
             QString::fromStdString(item.hostname),
-            QString::fromStdString(item.detectionTimestamp),
+            item.gpu,
             QString::fromStdString(item.errorTimestamp),
+            QString::fromStdString(item.windowType),
+            item.threshold,
+            QString::fromStdString(item.detectionTimestamp),
             item.leadTimeSeconds,
-            item.positive);
+            item.positive,
+            item.algorithmDetected,
+            item.ifScore,
+            item.ifDetected,
+            item.hybridDetected);
     }
 
-    const int anomalies = static_cast<int>(std::count(lastResult_.labels.begin(), lastResult_.labels.end(), 1));
-    emit analysisFinished(
-        QStringLiteral("1970187 is_failure validation"),
-        anomalies,
-        metrics.precision,
-        metrics.recall,
-        metrics.f1,
+    emit validationFinished(
+        QString::fromStdString(summary.algorithm),
+        static_cast<int>(summary.positiveCount),
+        static_cast<int>(summary.negativeCount),
+        summary.detectionRate,
         lastResult_.executionMs);
-    emit progressChanged(100, QStringLiteral("валидация завершена"));
+    emit progressChanged(100, QStringLiteral("????????? ?????????"));
 }
 
 void ExecutionThread::emitResultRows(const DetectorResult& result)
@@ -221,6 +243,22 @@ void ExecutionThread::emitResultRows(const DetectorResult& result)
     }
 }
 
+void ExecutionThread::emitValidationChartPoints(const std::vector<LeadTimeResult>& leadTimes)
+{
+    emit chartReset(QStringLiteral("lead_time_sec"));
+    for (const auto& item : leadTimes) {
+        long long failureSeconds = 0;
+        if (!RealFailureValidator::parseTimestampSeconds(item.errorTimestamp, failureSeconds)) {
+            continue;
+        }
+        const double y = item.positive ? item.leadTimeSeconds : -1.0;
+        emit chartPoint(
+            static_cast<int>(failureSeconds),
+            QString::fromStdString(item.errorTimestamp),
+            y,
+            item.positive);
+    }
+}
 void ExecutionThread::emitChartPoints(const DetectorResult& result)
 {
     if (dataset_.rows.empty() || dataset_.schema.numericColumns.empty()) {
@@ -256,5 +294,3 @@ void ExecutionThread::emitChartPoints(const DetectorResult& result)
 }
 
 } // namespace telemetry::gui
-
-

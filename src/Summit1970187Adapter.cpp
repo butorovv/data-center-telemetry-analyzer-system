@@ -483,6 +483,9 @@ DetectorResult Summit1970187Adapter::runHybrid(
     DetectorResult iforest = isolationForestResult(data, options);
     DetectorResult result = makeResultHeader("hybrid_iforest_graph", data);
     result.threshold = iforest.threshold;
+    for (std::size_t i = 0; i < std::min(result.scores.size(), iforest.scores.size()); ++i) {
+        result.scores[i] = iforest.scores[i];
+    }
 
     std::unordered_set<std::string> candidateHostTimes;
     const std::size_t rows = std::min(dataset.rows.size(), iforest.labels.size());

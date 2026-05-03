@@ -1,10 +1,12 @@
-#include "telemetry/ParquetConverter.hpp"
+﻿#include "telemetry/ParquetConverter.hpp"
 
 #include <cstdlib>
 #include <filesystem>
 #include <fstream>
 #include <memory>
 #include <sstream>
+#include <string>
+#include <vector>
 
 #ifdef HAS_ARROW_PARQUET
 #include <arrow/api.h>
@@ -30,6 +32,27 @@ std::string shellQuote(const std::filesystem::path& path)
     return quoted;
 }
 
+std::filesystem::path fallbackScriptPath()
+{
+    std::vector<std::filesystem::path> candidates;
+    try {
+        const auto cwd = std::filesystem::current_path();
+        candidates.push_back(cwd / "scripts" / "parquet_to_csv.py");
+        candidates.push_back(cwd.parent_path() / "scripts" / "parquet_to_csv.py");
+    } catch (...) {
+    }
+    candidates.push_back(std::filesystem::path("scripts") / "parquet_to_csv.py");
+    candidates.push_back(std::filesystem::path("..") / "scripts" / "parquet_to_csv.py");
+
+    for (const auto& candidate : candidates) {
+        std::error_code ec;
+        if (std::filesystem::exists(candidate, ec)) {
+            return std::filesystem::absolute(candidate, ec);
+        }
+    }
+    return {};
+}
+
 } // namespace
 
 bool ParquetConverter::arrowEnabled() const
@@ -50,7 +73,7 @@ bool ParquetConverter::convertToCsv(
     lastError_.clear();
     reportProgress(progress, 0, 100, "converting parquet");
     if (cancellation != nullptr && cancellation->isCancelled()) {
-        lastError_ = "Операция отменена до начала конвертации Parquet.";
+        lastError_ = "Parquet conversion was cancelled before start.";
         return false;
     }
 
@@ -77,7 +100,7 @@ bool ParquetConverter::convertToCsv(
 
     std::ofstream out(csvPath);
     if (!out) {
-        lastError_ = "Не удалось создать CSV: " + csvPath.string();
+        lastError_ = "Cannot create CSV: " + csvPath.string();
         return false;
     }
 
@@ -92,7 +115,7 @@ bool ParquetConverter::convertToCsv(
     const int64_t rows = table->num_rows();
     for (int64_t row = 0; row < rows; ++row) {
         if (cancellation != nullptr && cancellation->isCancelled()) {
-            lastError_ = "Конвертация Parquet отменена пользователем.";
+            lastError_ = "Parquet conversion was cancelled by user.";
             return false;
         }
         for (int col = 0; col < table->num_columns(); ++col) {
@@ -112,25 +135,37 @@ bool ParquetConverter::convertToCsv(
     reportProgress(progress, 100, 100, "parquet converted");
     return true;
 #else
-    std::ostringstream command;
-    command << "python " << shellQuote("scripts/parquet_to_csv.py")
-            << " --input " << shellQuote(parquetPath)
-            << " --output " << shellQuote(csvPath);
-    int rc = std::system(command.str().c_str());
-    if (rc != 0) {
-        std::ostringstream fallback;
-        fallback << "python3 " << shellQuote("scripts/parquet_to_csv.py")
-                 << " --input " << shellQuote(parquetPath)
-                 << " --output " << shellQuote(csvPath);
-        rc = std::system(fallback.str().c_str());
-    }
-    if (rc != 0) {
+    const auto script = fallbackScriptPath();
+    if (script.empty()) {
         lastError_ =
-            "Apache Arrow не подключен, Python fallback не выполнился. Установите Arrow/parquet-cpp или pandas/pyarrow.";
+            "Apache Arrow is not linked and Python fallback script scripts/parquet_to_csv.py was not found. "
+            "Run the GUI from the project root or rebuild the package with the scripts directory.";
         return false;
     }
-    reportProgress(progress, 100, 100, "parquet converted by fallback");
-    return true;
+
+    const std::vector<std::string> launchers = {"python", "py -3", "python3"};
+    for (const auto& launcher : launchers) {
+        if (cancellation != nullptr && cancellation->isCancelled()) {
+            lastError_ = "Parquet conversion was cancelled by user.";
+            return false;
+        }
+
+        std::ostringstream command;
+        command << launcher << ' ' << shellQuote(script)
+                << " --input " << shellQuote(parquetPath)
+                << " --output " << shellQuote(csvPath);
+        const int rc = std::system(command.str().c_str());
+        if (rc == 0 && std::filesystem::exists(csvPath)) {
+            reportProgress(progress, 100, 100, "parquet converted by python fallback");
+            return true;
+        }
+    }
+
+    lastError_ =
+        "Apache Arrow is not linked and Python fallback failed. "
+        "Install fallback dependencies with: python -m pip install pandas pyarrow. "
+        "Script: " + script.string();
+    return false;
 #endif
 }
 

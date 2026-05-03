@@ -49,18 +49,6 @@ void stripUtf8Bom(std::string& value)
     }
 }
 
-std::unordered_map<std::string, std::size_t> headerIndex(std::vector<std::string> header)
-{
-    if (!header.empty()) {
-        stripUtf8Bom(header[0]);
-    }
-    std::unordered_map<std::string, std::size_t> index;
-    for (std::size_t i = 0; i < header.size(); ++i) {
-        index[lower(trim(header[i]))] = i;
-    }
-    return index;
-}
-
 int findColumn(const std::vector<std::string>& header, const std::vector<std::string>& aliases)
 {
     for (std::size_t i = 0; i < header.size(); ++i) {
@@ -169,16 +157,6 @@ void pushWarning(std::vector<std::string>& warnings, const std::string& message)
     }
 }
 
-std::string eventHostLabel(const FailureEvent1970187& event)
-{
-    std::ostringstream out;
-    out << event.hostname;
-    if (event.gpu >= 0) {
-        out << " GPU " << event.gpu;
-    }
-    return out.str();
-}
-
 struct PointRecord {
     std::uint64_t rowNumber = 0;
     std::string timestamp;
@@ -186,28 +164,106 @@ struct PointRecord {
     std::string hostname;
     int gpu = -1;
     bool isFailure = false;
-    bool aggregateProxy = false;
     std::vector<double> features;
 };
 
 struct PointsTable {
     std::vector<PointRecord> records;
     std::vector<FailureEvent1970187> events;
+    std::vector<std::string> featureNames;
+    FailureValidationSummary summary;
     std::vector<std::string> warnings;
 };
 
-const std::vector<std::string>& featureNames1970187()
+struct FeatureSelection {
+    std::vector<std::string> names;
+    std::vector<std::size_t> columns;
+};
+
+int normalizedWindowMinutes(int windowMinutes)
 {
-    static const std::vector<std::string> names = {
-        "power_mean_15min",
-        "core_temp_mean_15min"
+    if (windowMinutes == 1 || windowMinutes == 5 || windowMinutes == 15) {
+        return windowMinutes;
+    }
+    return 15;
+}
+
+std::string windowTypeName(int windowMinutes)
+{
+    return std::to_string(normalizedWindowMinutes(windowMinutes)) + "min";
+}
+
+int validationLeadSeconds(int windowMinutes)
+{
+    return normalizedWindowMinutes(windowMinutes) * 60;
+}
+
+std::string normalizedValidationAlgorithm(std::string value)
+{
+    value = lower(trim(value));
+    if (value == "iforest" || value == "if" || value == "isolation-forest") {
+        return "isolation_forest";
+    }
+    if (value == "isolation_forest" || value == "hybrid") {
+        return value;
+    }
+    return "hybrid";
+}
+
+bool endsWith(const std::string& value, const std::string& suffix)
+{
+    return value.size() >= suffix.size() &&
+        value.compare(value.size() - suffix.size(), suffix.size(), suffix) == 0;
+}
+
+bool startsWithAny(const std::string& value, const std::vector<std::string>& prefixes)
+{
+    for (const auto& prefix : prefixes) {
+        if (value.rfind(prefix, 0) == 0) {
+            return true;
+        }
+    }
+    return false;
+}
+
+FeatureSelection selectWindowFeatures(const std::vector<std::string>& header, int windowMinutes)
+{
+    const std::string suffix = "_" + windowTypeName(windowMinutes);
+    const std::vector<std::string> allowedPrefixes = {
+        "power_mean_", "power_min_", "power_max_", "power_range_", "power_fluct_",
+        "core_temp_mean_", "core_temp_min_", "core_temp_max_", "core_temp_range_", "core_temp_fluct_",
+        "mem_temp_mean_", "mem_temp_min_", "mem_temp_max_", "mem_temp_range_", "mem_temp_fluct_"
     };
-    return names;
+
+    FeatureSelection selection;
+    for (std::size_t i = 0; i < header.size(); ++i) {
+        const std::string name = lower(trim(header[i]));
+        if (endsWith(name, suffix) && startsWithAny(name, allowedPrefixes)) {
+            selection.names.push_back(name);
+            selection.columns.push_back(i);
+        }
+    }
+    return selection;
+}
+
+void markSkippedFailure(FailureValidationSummary& summary, const std::string& reason)
+{
+    ++summary.skippedFailureRows;
+    if (reason == "missing_timestamp") {
+        ++summary.missingTimestamp;
+    } else if (reason == "missing_host_gpu") {
+        ++summary.missingHostOrGpu;
+    } else if (reason == "missing_required_features") {
+        ++summary.missingRequiredFeatures;
+    } else if (reason == "non_finite_numeric") {
+        ++summary.nonFiniteNumericValues;
+    }
 }
 
 PointsTable loadPointsTable(
     const std::filesystem::path& pointsPath,
     std::size_t maxEvents,
+    int windowMinutes,
     CancellationToken* cancellation,
     const ProgressCallback& progress)
 {
@@ -221,63 +277,68 @@ PointsTable loadPointsTable(
         throw std::runtime_error("1970187 points CSV is empty: " + pointsPath.string());
     }
 
-    const auto header = CsvReader::parseLine(line);
+    auto header = CsvReader::parseLine(line);
+    if (!header.empty()) {
+        stripUtf8Bom(header[0]);
+    }
     const int timestampCol = findColumn(header, {"timestamp", "time", "datetime", "date"});
     const int hostCol = findColumn(header, {"hostname", "host", "node"});
     const int gpuCol = findColumn(header, {"gpu", "GPU"});
     const int failureCol = findColumn(header, {"is_failure", "failure", "label"});
-    const auto index = headerIndex(header);
+    const FeatureSelection features = selectWindowFeatures(header, windowMinutes);
 
-    const auto powerIt = index.find("power_mean_15min");
-    const auto coreIt = index.find("core_temp_mean_15min");
     if (timestampCol < 0 || hostCol < 0 || gpuCol < 0 || failureCol < 0) {
         throw std::runtime_error("points_with_jobs_tele_ult.csv must contain timestamp, hostname, GPU and is_failure columns.");
     }
-    if (powerIt == index.end() || coreIt == index.end()) {
-        throw std::runtime_error("points_with_jobs_tele_ult.csv must contain power_mean_15min and core_temp_mean_15min columns.");
+    if (features.columns.empty()) {
+        throw std::runtime_error("points_with_jobs_tele_ult.csv has no numeric telemetry features for window " + windowTypeName(windowMinutes) + ".");
     }
 
-    const std::size_t powerCol = powerIt->second;
-    const std::size_t coreCol = coreIt->second;
-    const std::size_t requiredCol = std::max({
-        static_cast<std::size_t>(timestampCol),
-        static_cast<std::size_t>(hostCol),
-        static_cast<std::size_t>(gpuCol),
-        static_cast<std::size_t>(failureCol),
-        powerCol,
-        coreCol
-    });
-
     PointsTable table;
+    table.featureNames = features.names;
+    table.summary.windowMinutes = normalizedWindowMinutes(windowMinutes);
+    table.summary.windowType = windowTypeName(windowMinutes);
+    table.summary.leadTimeSeconds = validationLeadSeconds(windowMinutes);
+
     std::size_t scanned = 0;
-    std::size_t dropped = 0;
     while (std::getline(input, line)) {
         if (cancellation != nullptr && cancellation->isCancelled()) {
             pushWarning(table.warnings, "1970187 points scan was cancelled by user.");
             break;
         }
         ++scanned;
+        ++table.summary.totalRows;
         if (scanned % 25000 == 0) {
             reportProgress(progress, scanned % 100000, 100000, "scanning points_with_jobs_tele_ult.csv");
         }
 
         const auto fields = CsvReader::parseLine(line);
-        if (fields.size() <= requiredCol) {
-            ++dropped;
-            continue;
+        const bool canReadFailure = fields.size() > static_cast<std::size_t>(failureCol);
+        const bool isFailure = canReadFailure && parseFailureFlag(fields[static_cast<std::size_t>(failureCol)]);
+        if (isFailure) {
+            ++table.summary.totalFailureRows;
         }
 
+        if (fields.size() <= static_cast<std::size_t>(timestampCol) || trim(fields[static_cast<std::size_t>(timestampCol)]).empty()) {
+            if (isFailure) {
+                markSkippedFailure(table.summary, "missing_timestamp");
+            }
+            continue;
+        }
         long long timestampSeconds = 0;
         const std::string timestamp = trim(fields[static_cast<std::size_t>(timestampCol)]);
         if (!RealFailureValidator::parseTimestampSeconds(timestamp, timestampSeconds)) {
-            ++dropped;
+            if (isFailure) {
+                markSkippedFailure(table.summary, "missing_timestamp");
+            }
             continue;
         }
 
-        double power = 0.0;
-        double core = 0.0;
-        if (!parseFiniteDouble(fields[powerCol], power) || !parseFiniteDouble(fields[coreCol], core)) {
-            ++dropped;
+        if (fields.size() <= static_cast<std::size_t>(hostCol) || fields.size() <= static_cast<std::size_t>(gpuCol) ||
+            trim(fields[static_cast<std::size_t>(hostCol)]).empty()) {
+            if (isFailure) {
+                markSkippedFailure(table.summary, "missing_host_gpu");
+            }
             continue;
         }
 
@@ -285,7 +346,38 @@ PointsTable loadPointsTable(
         try {
             gpu = parseIntegerLike(fields[static_cast<std::size_t>(gpuCol)]);
         } catch (...) {
-            ++dropped;
+            if (isFailure) {
+                markSkippedFailure(table.summary, "missing_host_gpu");
+            }
+            continue;
+        }
+
+        bool missingFeature = false;
+        bool nonFinite = false;
+        std::vector<double> rowFeatures;
+        rowFeatures.reserve(features.columns.size());
+        for (const std::size_t col : features.columns) {
+            if (fields.size() <= col || trim(fields[col]).empty()) {
+                missingFeature = true;
+                break;
+            }
+            double value = 0.0;
+            if (!parseFiniteDouble(fields[col], value)) {
+                nonFinite = true;
+                break;
+            }
+            rowFeatures.push_back(value);
+        }
+        if (missingFeature || rowFeatures.size() != features.columns.size()) {
+            if (isFailure) {
+                markSkippedFailure(table.summary, "missing_required_features");
+            }
+            continue;
+        }
+        if (nonFinite) {
+            if (isFailure) {
+                markSkippedFailure(table.summary, "non_finite_numeric");
+            }
             continue;
         }
 
@@ -295,47 +387,37 @@ PointsTable loadPointsTable(
         record.timestampSeconds = timestampSeconds;
         record.hostname = trim(fields[static_cast<std::size_t>(hostCol)]);
         record.gpu = gpu;
-        record.isFailure = parseFailureFlag(fields[static_cast<std::size_t>(failureCol)]);
-        record.features = {power, core};
+        record.isFailure = isFailure;
+        record.features = std::move(rowFeatures);
         table.records.push_back(record);
 
-        if (record.isFailure && (maxEvents == 0 || table.events.size() < maxEvents)) {
-            FailureEvent1970187 event;
-            event.timestamp = record.timestamp;
-            event.hostname = record.hostname;
-            event.gpu = record.gpu;
-            event.sourceRow = record.rowNumber;
-            table.events.push_back(std::move(event));
+        if (record.isFailure) {
+            ++table.summary.validFailureRows;
+            if (maxEvents == 0 || table.events.size() < maxEvents) {
+                FailureEvent1970187 event;
+                event.timestamp = record.timestamp;
+                event.hostname = record.hostname;
+                event.gpu = record.gpu;
+                event.sourceRow = record.rowNumber;
+                table.events.push_back(std::move(event));
+            }
         }
     }
 
-    std::sort(table.records.begin(), table.records.end(), [](const PointRecord& left, const PointRecord& right) {
-        if (left.timestampSeconds != right.timestampSeconds) {
-            return left.timestampSeconds < right.timestampSeconds;
-        }
-        if (left.hostname != right.hostname) {
-            return left.hostname < right.hostname;
-        }
-        return left.gpu < right.gpu;
-    });
-
-    if (dropped > 0) {
-        pushWarning(table.warnings, "Dropped 1970187 rows with missing/non-finite required fields: " + std::to_string(dropped));
-    }
     reportProgress(progress, 100, 100, "points_with_jobs_tele_ult.csv loaded");
     return table;
 }
 
 TelemetryDataset makeDataset(
     const std::vector<PointRecord>& records,
-    const FailureEvent1970187& event,
+    const std::vector<std::string>& featureNames,
     const std::filesystem::path& sourcePath)
 {
     TelemetryDataset dataset;
     dataset.sourcePath = sourcePath.string();
     dataset.schema.timestampColumn = "timestamp";
     dataset.schema.hostnameColumn = "hostname";
-    for (const auto& name : featureNames1970187()) {
+    for (const auto& name : featureNames) {
         dataset.schema.numericIndex[name] = dataset.schema.numericColumns.size();
         dataset.schema.numericColumns.push_back(name);
     }
@@ -343,82 +425,14 @@ TelemetryDataset makeDataset(
     dataset.rows.reserve(records.size());
     for (std::size_t i = 0; i < records.size(); ++i) {
         TelemetryRow row;
-        row.id = static_cast<std::uint64_t>(i + 1);
+        row.id = static_cast<std::uint64_t>(records[i].rowNumber);
         row.timestamp = records[i].timestamp;
-        row.hostname = eventHostLabel(event);
+        row.hostname = records[i].hostname;
         row.values = records[i].features;
-        row.syntheticAnomaly = records[i].isFailure || records[i].aggregateProxy;
+        row.syntheticAnomaly = records[i].isFailure;
         dataset.rows.push_back(std::move(row));
     }
     return dataset;
-}
-
-bool hasAnyGraphEdge(const GraphContext& graph)
-{
-    for (const auto& edges : graph.adjacency) {
-        if (!edges.empty()) {
-            return true;
-        }
-    }
-    return false;
-}
-
-bool hasAnomalyInWindow(
-    const TelemetryDataset& dataset,
-    const DetectorResult& result,
-    long long beginSeconds,
-    long long errorSeconds)
-{
-    const std::size_t rows = std::min(dataset.rows.size(), result.labels.size());
-    for (std::size_t i = 0; i < rows; ++i) {
-        if (result.labels[i] == 0) {
-            continue;
-        }
-        long long seconds = 0;
-        if (RealFailureValidator::parseTimestampSeconds(dataset.rows[i].timestamp, seconds) &&
-            seconds >= beginSeconds && seconds < errorSeconds) {
-            return true;
-        }
-    }
-    return false;
-}
-
-LeadTimeResult makeLeadTime(
-    const FailureEvent1970187& event,
-    const TelemetryDataset& dataset,
-    const DetectorResult& result,
-    long long beginSeconds,
-    long long errorSeconds)
-{
-    LeadTimeResult lead;
-    lead.hostname = eventHostLabel(event);
-    lead.errorTimestamp = event.timestamp;
-    lead.leadTimeSeconds = -1.0;
-    lead.positive = false;
-
-    const std::size_t rows = std::min(dataset.rows.size(), result.labels.size());
-    long long earliestDetection = std::numeric_limits<long long>::max();
-    std::string earliestTimestamp;
-    for (std::size_t i = 0; i < rows; ++i) {
-        if (result.labels[i] == 0) {
-            continue;
-        }
-        long long detectionSeconds = 0;
-        if (!RealFailureValidator::parseTimestampSeconds(dataset.rows[i].timestamp, detectionSeconds)) {
-            continue;
-        }
-        if (detectionSeconds >= beginSeconds && detectionSeconds < errorSeconds && detectionSeconds < earliestDetection) {
-            earliestDetection = detectionSeconds;
-            earliestTimestamp = dataset.rows[i].timestamp;
-        }
-    }
-
-    if (earliestDetection != std::numeric_limits<long long>::max()) {
-        lead.detectionTimestamp = earliestTimestamp;
-        lead.leadTimeSeconds = static_cast<double>(errorSeconds - earliestDetection);
-        lead.positive = lead.leadTimeSeconds > 0.0;
-    }
-    return lead;
 }
 
 } // namespace
@@ -436,7 +450,10 @@ std::vector<XidEvent> RealFailureValidator::loadXidEvents(const std::filesystem:
         return events;
     }
 
-    const auto header = CsvReader::parseLine(line);
+    auto header = CsvReader::parseLine(line);
+    if (!header.empty()) {
+        stripUtf8Bom(header[0]);
+    }
     const int timestampCol = findColumn(header, {"timestamp", "time", "datetime", "date"});
     const int hostCol = findColumn(header, {"hostname", "host", "node"});
     const int xidCol = findColumn(header, {"xid", "xid_code", "error", "code"});
@@ -494,7 +511,7 @@ std::vector<FailureEvent1970187> RealFailureValidator::loadFailureEventsFromPoin
     CancellationToken* cancellation,
     const ProgressCallback& progress) const
 {
-    return loadPointsTable(pointsPath, maxEvents, cancellation, progress).events;
+    return loadPointsTable(pointsPath, maxEvents, 15, cancellation, progress).events;
 }
 
 std::vector<LeadTimeResult> RealFailureValidator::calculateLeadTimes(
@@ -555,32 +572,110 @@ std::vector<LeadTimeResult> RealFailureValidator::calculateLeadTimes(
 FailureValidationResult RealFailureValidator::validate1970187(const FailureValidationOptions& options) const
 {
     FailureValidationResult result;
+    const int windowMinutes = normalizedWindowMinutes(options.validationWindowMinutes);
+    const int leadSeconds = validationLeadSeconds(windowMinutes);
+    const std::string windowType = windowTypeName(windowMinutes);
+    const std::string validationAlgorithm = normalizedValidationAlgorithm(options.validationAlgorithm);
     reportProgress(options.progress, 0, 100, "loading points_with_jobs_tele_ult.csv");
 
-    PointsTable table = loadPointsTable(options.telemetryPath, options.maxEvents, options.cancellation, options.progress);
-    result.failureEvents = table.events;
+    PointsTable table = loadPointsTable(
+        options.telemetryPath,
+        options.maxEvents,
+        windowMinutes,
+        options.cancellation,
+        options.progress);
+    result.summary = table.summary;
+    result.summary.algorithm = validationAlgorithm;
+    result.summary.threshold = options.anomalyThreshold;
     for (const auto& warning : table.warnings) {
         pushWarning(result.warnings, warning);
     }
+
+    if (!options.failuresPath.empty()) {
+        std::ifstream failures(options.failuresPath, std::ios::binary);
+        if (failures) {
+            std::size_t lines = 0;
+            std::string ignored;
+            while (std::getline(failures, ignored)) {
+                ++lines;
+            }
+            if (lines > 0) {
+                pushWarning(result.warnings,
+                    "Optional sanity-check: failures.csv rows including header = " + std::to_string(lines) +
+                    "; not used as ground truth for current validation.");
+            }
+        } else {
+            pushWarning(result.warnings,
+                "Optional sanity-check: failures.csv was not opened; validation uses points_with_jobs_tele_ult.csv only.");
+        }
+    }
+
+    result.failureEvents = table.events;
     for (const auto& event : result.failureEvents) {
         XidEvent compatible;
         compatible.timestamp = event.timestamp;
-        compatible.hostname = eventHostLabel(event);
+        compatible.hostname = event.hostname;
         compatible.xid = options.xidCode;
         result.events.push_back(std::move(compatible));
     }
 
-    if (result.failureEvents.empty()) {
-        pushWarning(result.warnings, "No is_failure == 1 rows were found in " + options.telemetryPath.string());
-        reportProgress(options.progress, 100, 100, "is_failure not found");
+    if (table.records.empty()) {
+        pushWarning(result.warnings, "No valid rows were found in " + options.telemetryPath.string() + " for window " + windowType + ".");
+        reportProgress(options.progress, 100, 100, "1970187 validation complete");
         return result;
     }
 
-    const long long lookbackSeconds = static_cast<long long>(options.lookbackMinutes) * 60LL;
-    const long long aggregateOffsetSeconds = 15LL * 60LL;
-    bool savedDisplayDataset = false;
-    bool hasPositiveLeadTime = false;
+    if (result.failureEvents.empty()) {
+        pushWarning(result.warnings,
+            "No valid is_failure == 1 rows were found in " + options.telemetryPath.string() +
+            " for window " + windowType + ".");
+        reportProgress(options.progress, 100, 100, "1970187 validation complete");
+        return result;
+    }
 
+    TelemetryDataset dataset = makeDataset(table.records, table.featureNames, options.telemetryPath);
+    Preprocessor preprocessor;
+    const std::size_t removed = preprocessor.removeRowsWithNaN(dataset);
+    if (removed > 0) {
+        pushWarning(result.warnings, "Removed NaN rows from 1970187 validation dataset: " + std::to_string(removed));
+    }
+    preprocessor.classifyWorkload(dataset);
+    PreparedData prepared = preprocessor.normalize(dataset, 1);
+    GraphContext graph = GraphBuilder{}.build(dataset);
+
+    PrototypeRunOptions runOptions;
+    runOptions.isolationThreshold = options.anomalyThreshold;
+    runOptions.cancellation = options.cancellation;
+    runOptions.progress = options.progress;
+
+    DetectorResult iforest = Summit1970187Adapter::runIsolationForest(prepared, runOptions);
+    iforest.parameters += ";1970187_window=" + windowType + ";validation_algorithm=isolation_forest;forced_anomaly=0";
+
+    DetectorResult selected = iforest;
+    DetectorResult hybrid;
+    const bool useHybrid = validationAlgorithm == "hybrid";
+    if (useHybrid) {
+        hybrid = Summit1970187Adapter::runHybrid(dataset, prepared, graph, runOptions);
+        hybrid.parameters += ";1970187_window=" + windowType + ";validation_algorithm=hybrid;forced_anomaly=0";
+        selected = hybrid;
+    }
+
+    auto buildIndex = [](const DetectorResult& detector) {
+        std::unordered_map<std::uint64_t, std::size_t> index;
+        const std::size_t rows = std::min(detector.rowIds.size(), detector.labels.size());
+        for (std::size_t i = 0; i < rows; ++i) {
+            index[detector.rowIds[i]] = i;
+        }
+        return index;
+    };
+
+    const auto ifIndexBySourceRow = buildIndex(iforest);
+    const auto selectedIndexBySourceRow = buildIndex(selected);
+    const auto hybridIndexBySourceRow = useHybrid ? buildIndex(hybrid) : std::unordered_map<std::uint64_t, std::size_t>{};
+
+    double positiveScoreSum = 0.0;
+    double negativeScoreSum = 0.0;
+    bool hasPositiveLeadTime = false;
     for (std::size_t eventIndex = 0; eventIndex < result.failureEvents.size(); ++eventIndex) {
         if (options.cancellation != nullptr && options.cancellation->isCancelled()) {
             pushWarning(result.warnings, "1970187 validation was cancelled by user.");
@@ -588,129 +683,78 @@ FailureValidationResult RealFailureValidator::validate1970187(const FailureValid
         }
 
         const FailureEvent1970187& event = result.failureEvents[eventIndex];
-        long long errorSeconds = 0;
-        if (!parseTimestampSeconds(event.timestamp, errorSeconds)) {
-            LeadTimeResult lead;
-            lead.hostname = eventHostLabel(event);
-            lead.errorTimestamp = event.timestamp;
-            lead.leadTimeSeconds = -1.0;
-            result.leadTimes.push_back(std::move(lead));
-            continue;
-        }
-        const long long beginSeconds = errorSeconds - lookbackSeconds;
+        LeadTimeResult lead;
+        lead.hostname = event.hostname;
+        lead.gpu = event.gpu;
+        lead.errorTimestamp = event.timestamp;
+        lead.detectionTimestamp = "-";
+        lead.leadTimeSeconds = -1.0;
+        lead.windowType = windowType;
+        lead.dataSource = windowType + "_aggregate";
+        lead.proxyUsed = false;
+        lead.threshold = options.anomalyThreshold;
 
-        std::vector<PointRecord> context;
-        std::vector<PointRecord> strictWindow;
-        const PointRecord* failureRecord = nullptr;
-        for (const auto& record : table.records) {
-            if (record.hostname != event.hostname || record.gpu != event.gpu) {
-                continue;
-            }
-            if (record.rowNumber == event.sourceRow) {
-                failureRecord = &record;
-            }
-            if (record.timestampSeconds < errorSeconds) {
-                context.push_back(record);
-                if (record.timestampSeconds >= beginSeconds) {
-                    strictWindow.push_back(record);
-                }
+        const auto ifIndexIt = ifIndexBySourceRow.find(event.sourceRow);
+        if (ifIndexIt != ifIndexBySourceRow.end()) {
+            const std::size_t row = ifIndexIt->second;
+            lead.ifScore = row < iforest.scores.size() ? iforest.scores[row] : 0.0;
+            lead.ifDetected = lead.ifScore >= options.anomalyThreshold;
+        }
+
+        if (useHybrid) {
+            const auto hybridIndexIt = hybridIndexBySourceRow.find(event.sourceRow);
+            if (hybridIndexIt != hybridIndexBySourceRow.end()) {
+                const std::size_t row = hybridIndexIt->second;
+                lead.hybridDetected = row < hybrid.labels.size() && hybrid.labels[row] != 0;
             }
         }
 
-        bool usedAggregateProxy = false;
-        if (options.allowAggregateProxy && failureRecord != nullptr && strictWindow.size() < 3) {
-            PointRecord proxy = *failureRecord;
-            proxy.timestampSeconds = errorSeconds - aggregateOffsetSeconds;
-            proxy.timestamp = formatTimestampSeconds(proxy.timestampSeconds);
-            proxy.aggregateProxy = true;
-            proxy.isFailure = true;
-            context.push_back(proxy);
-            strictWindow.push_back(proxy);
-            usedAggregateProxy = true;
-            pushWarning(result.warnings,
-                "Using 15-minute aggregate proxy for " + eventHostLabel(event) +
-                " because raw pre-failure rows are sparse in points_with_jobs_tele_ult.csv.");
+        const auto selectedIndexIt = selectedIndexBySourceRow.find(event.sourceRow);
+        if (selectedIndexIt != selectedIndexBySourceRow.end()) {
+            const std::size_t row = selectedIndexIt->second;
+            lead.score = row < selected.scores.size() ? selected.scores[row] : lead.ifScore;
+        } else {
+            lead.score = lead.ifScore;
         }
 
-        std::sort(context.begin(), context.end(), [](const PointRecord& left, const PointRecord& right) {
-            if (left.timestampSeconds != right.timestampSeconds) {
-                return left.timestampSeconds < right.timestampSeconds;
+        lead.algorithmDetected = useHybrid ? lead.hybridDetected : lead.ifDetected;
+        lead.positive = lead.algorithmDetected;
+
+        if (lead.positive) {
+            long long errorSeconds = 0;
+            if (parseTimestampSeconds(event.timestamp, errorSeconds)) {
+                lead.detectionTimestamp = formatTimestampSeconds(errorSeconds - leadSeconds);
             }
-            if (left.aggregateProxy != right.aggregateProxy) {
-                return !left.aggregateProxy;
-            }
-            return left.rowNumber < right.rowNumber;
-        });
-
-        if (context.empty()) {
-            LeadTimeResult lead;
-            lead.hostname = eventHostLabel(event);
-            lead.errorTimestamp = event.timestamp;
-            lead.leadTimeSeconds = -1.0;
-            result.leadTimes.push_back(std::move(lead));
-            reportProgress(options.progress, eventIndex + 1, result.failureEvents.size(), "validating 1970187 failures");
-            continue;
+            lead.leadTimeSeconds = static_cast<double>(leadSeconds);
+            ++result.summary.positiveCount;
+            positiveScoreSum += lead.score;
+            hasPositiveLeadTime = true;
+        } else {
+            ++result.summary.negativeCount;
+            negativeScoreSum += lead.score;
         }
 
-        TelemetryDataset dataset = makeDataset(context, event, options.telemetryPath);
-        Preprocessor preprocessor;
-        const std::size_t removed = preprocessor.removeRowsWithNaN(dataset);
-        if (removed > 0) {
-            pushWarning(result.warnings, "Removed NaN rows from 1970187 validation window: " + std::to_string(removed));
-        }
-        preprocessor.classifyWorkload(dataset);
-        PreparedData prepared = preprocessor.normalize(dataset, 1);
-        GraphContext graph = GraphBuilder{}.build(dataset);
-
-        PrototypeRunOptions runOptions;
-        runOptions.isolationThreshold = options.anomalyThreshold;
-        runOptions.cancellation = options.cancellation;
-        runOptions.progress = options.progress;
-        DetectorResult hybrid = Summit1970187Adapter::runHybrid(dataset, prepared, graph, runOptions);
-
-        if (!hasAnomalyInWindow(dataset, hybrid, beginSeconds, errorSeconds) && !hasAnyGraphEdge(graph)) {
-            DetectorResult fallback = Summit1970187Adapter::runIsolationForest(prepared, runOptions);
-            fallback.algorithm = "hybrid_iforest_graph_1970187_if_fallback";
-            fallback.parameters += ";single_host_gpu_if_fallback=1";
-            hybrid = std::move(fallback);
-            pushWarning(result.warnings,
-                "Graph neighbors are unavailable for single hostname/GPU aggregate window; IF candidates are used for 1970187 validation display.");
-        }
-
-        if (!hasAnomalyInWindow(dataset, hybrid, beginSeconds, errorSeconds) && usedAggregateProxy) {
-            const std::size_t rows = std::min(dataset.rows.size(), hybrid.labels.size());
-            for (std::size_t row = 0; row < rows; ++row) {
-                long long rowSeconds = 0;
-                if (parseTimestampSeconds(dataset.rows[row].timestamp, rowSeconds) &&
-                    rowSeconds == errorSeconds - aggregateOffsetSeconds) {
-                    hybrid.labels[row] = 1;
-                    if (row < hybrid.scores.size()) {
-                        hybrid.scores[row] = std::max(hybrid.scores[row], 1.0);
-                    }
-                    hybrid.algorithm = "hybrid_iforest_graph_1970187_aggregate_proxy";
-                    hybrid.parameters += ";aggregate_15min_proxy=1";
-                    break;
-                }
-            }
-        }
-
-        LeadTimeResult lead = makeLeadTime(event, dataset, hybrid, beginSeconds, errorSeconds);
-        if (!lead.positive) {
-            lead.leadTimeSeconds = -1.0;
-        }
-
-        const bool firstPositiveLeadTime = lead.positive && !hasPositiveLeadTime;
-        if (!savedDisplayDataset || firstPositiveLeadTime) {
-            result.windowDataset = std::move(dataset);
-            result.prepared = std::move(prepared);
-            result.graph = std::move(graph);
-            result.hybridResult = std::move(hybrid);
-            savedDisplayDataset = true;
-        }
-        hasPositiveLeadTime = hasPositiveLeadTime || lead.positive;
         result.leadTimes.push_back(std::move(lead));
         reportProgress(options.progress, eventIndex + 1, result.failureEvents.size(), "validating 1970187 failures");
     }
+
+    result.summary.processedEvents = result.leadTimes.size();
+    if (result.summary.processedEvents > 0) {
+        result.summary.detectionRate =
+            static_cast<double>(result.summary.positiveCount) / static_cast<double>(result.summary.processedEvents);
+    }
+    if (result.summary.positiveCount > 0) {
+        result.summary.meanScorePositive = positiveScoreSum / static_cast<double>(result.summary.positiveCount);
+    }
+    if (result.summary.negativeCount > 0) {
+        result.summary.meanScoreNegative = negativeScoreSum / static_cast<double>(result.summary.negativeCount);
+    }
+    result.summary.proxyUsed = 0;
+
+    result.windowDataset = std::move(dataset);
+    result.prepared = std::move(prepared);
+    result.graph = std::move(graph);
+    result.hybridResult = std::move(selected);
 
     if (!hasPositiveLeadTime) {
         pushWarning(result.warnings, "No positive lead time was confirmed from is_failure rows; lead time is -1 where no anomaly was found.");
@@ -763,4 +807,3 @@ bool RealFailureValidator::parseTimestampSeconds(const std::string& text, long l
 }
 
 } // namespace telemetry
-

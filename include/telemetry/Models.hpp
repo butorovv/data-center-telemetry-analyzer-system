@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <cstdint>
 #include <string>
@@ -71,10 +71,20 @@ struct XidEvent {
 
 struct LeadTimeResult {
     std::string hostname;
+    int gpu = -1;
     std::string errorTimestamp;
     std::string detectionTimestamp;
     double leadTimeSeconds = 0.0;
     bool positive = false;
+    bool algorithmDetected = false;
+    double score = 0.0;
+    double threshold = 0.75;
+    double ifScore = 0.0;
+    bool ifDetected = false;
+    bool hybridDetected = false;
+    std::string windowType;
+    std::string dataSource;
+    bool proxyUsed = false;
 };
 
 } // namespace telemetry

@@ -133,13 +133,25 @@ The compose stack starts PostgreSQL 13 and runs the CLI demo against `data/sampl
 
 ## 1970187 validation
 
-The course-project validation uses `second_dataset/points_with_jobs_tele_ult.csv`. The column `is_failure` is the ground truth: `1` means a Double-Bit Error event. `failures.csv` and `locations_by_serials.csv` can stay in the folder, but the current validation path does not depend on them.
+The course-project validation uses `second_dataset/points_with_jobs_tele_ult.csv`. The column `is_failure` is ground truth only: `1` means a Double-Bit Error event, and it is explicitly excluded from detector features.
+
+Validation windows are selectable:
+
+- `--validation-window 1` uses telemetry columns ending with `_1min` and gives `lead_time_sec = 60` only for detected events.
+- `--validation-window 5` uses `_5min` and gives `lead_time_sec = 300` only for detected events.
+- `--validation-window 15` uses `_15min` and gives `lead_time_sec = 900` only for detected events.
+
+`failures.csv` is optional sanity-check input; it is not used as the main ground-truth source.
 
 ```bash
 ./build/telemetry_analyzer --validate-1970187 \
   --points second_dataset/points_with_jobs_tele_ult.csv \
-  --threshold 0.75
+  --failures second_dataset/failures.csv \
+  --threshold 0.75 \
+  --validation-window 15
 ```
+
+The honest validator no longer forces proxy rows to anomalies. If the hybrid algorithm does not mark a DBE row as anomalous by itself, the row is exported as `positive=no`, `algorithm_detected=no`, `lead_time_sec=-1`.
 
 ## Interactive mode
 
@@ -198,18 +210,21 @@ Isolation Forest uses 100 trees, sample size 256 and default anomaly threshold 0
 
 The 1970187 validation file is expected in `second_dataset/`:
 
-- `points_with_jobs_tele_ult.csv` - used by the validator (`timestamp`, `hostname`, `GPU`, `is_failure`, `power_mean_15min`, `core_temp_mean_15min`).
-- `failures.csv` and `locations_by_serials.csv` are kept as auxiliary files, but are not used by the current KP validation flow.
+- `points_with_jobs_tele_ult.csv` - used by the validator (`timestamp`, `hostname`, `GPU`, `is_failure`, and telemetry aggregates with `_1min`, `_5min`, `_15min`).
+- `failures.csv` - optional sanity-check only.
+- `locations_by_serials.csv` - kept as an auxiliary file and not required by the current validation flow.
 
 CLI validation example:
 
 ```bash
 ./build/telemetry_analyzer --validate-1970187 \
   --points second_dataset/points_with_jobs_tele_ult.csv \
-  --threshold 0.75
+  --failures second_dataset/failures.csv \
+  --threshold 0.75 \
+  --validation-window 15
 ```
 
-Validation-specific simplification: `Summit1970187Adapter` is a separate copy of the detector adapter for this dataset. It uses `power_mean_15min` and `core_temp_mean_15min` instead of raw Summit columns. When raw pre-failure rows are sparse, the validator uses the failure row's 15-minute aggregates as a proxy observation at `timestamp - 15 minutes` to demonstrate the lead-time calculation mechanics. The main `SummitPrototypeAdapter` remains unchanged.
+Validation-specific note: `Summit1970187Adapter` is a separate detector adapter for the aggregate second dataset. The main `SummitPrototypeAdapter` remains unchanged. The validator uses aggregate rows as input data, but it does not automatically count them as detected anomalies.
 
 Docker launch remains:
 
@@ -218,5 +233,3 @@ docker-compose up --build
 ```
 
 Parquet conversion prefers Apache Arrow/parquet-cpp when the C++ development libraries are available. If Arrow is not available in the local environment, the code keeps the Python fallback path and CSV inputs can be used for local debugging.
-
-

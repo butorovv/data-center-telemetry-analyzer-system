@@ -1,0 +1,460 @@
+﻿[progress] 0% loading points_with_jobs_tele_ult.csv
+[progress] 25% scanning points_with_jobs_tele_ult.csv
+[progress] 50% scanning points_with_jobs_tele_ult.csv
+[progress] 100% points_with_jobs_tele_ult.csv loaded
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% scoring isolation forest
+[progress] 100% validating 1970187 failures
+[progress] 100% 1970187 validation complete
+
+Validation 1970187 / is_failure == 1
+Warning: Dropped 1970187 rows with missing/non-finite required fields: 16482
+Warning: Using 15-minute aggregate proxy for c04n16 GPU 1 because raw pre-failure rows are sparse in points_with_jobs_tele_ult.csv.
+Warning: Graph neighbors are unavailable for single hostname/GPU aggregate window; IF candidates are used for 1970187 validation display.
+Warning: Using 15-minute aggregate proxy for f02n02 GPU 3 because raw pre-failure rows are sparse in points_with_jobs_tele_ult.csv.
+Warning: Graph neighbors are unavailable for single hostname/GPU aggregate window; IF candidates are used for 1970187 validation display.
+Warning: Using 15-minute aggregate proxy for a25n02 GPU 5 because raw pre-failure rows are sparse in points_with_jobs_tele_ult.csv.
+Warning: Graph neighbors are unavailable for single hostname/GPU aggregate window; IF candidates are used for 1970187 validation display.
+Warning: Using 15-minute aggregate proxy for h28n16 GPU 1 because raw pre-failure rows are sparse in points_with_jobs_tele_ult.csv.
+Warning: Graph neighbors are unavailable for single hostname/GPU aggregate window; IF candidates are used for 1970187 validation display.
+Warning: Using 15-minute aggregate proxy for g20n07 GPU 0 because raw pre-failure rows are sparse in points_with_jobs_tele_ult.csv.
+Warning: Graph neighbors are unavailable for single hostname/GPU aggregate window; IF candidates are used for 1970187 validation display.
+Warning: Using 15-minute aggregate proxy for g20n07 GPU 0 because raw pre-failure rows are sparse in points_with_jobs_tele_ult.csv.
+Warning: Graph neighbors are unavailable for single hostname/GPU aggregate window; IF candidates are used for 1970187 validation display.
+Warning: Using 15-minute aggregate proxy for d11n06 GPU 4 because raw pre-failure rows are sparse in points_with_jobs_tele_ult.csv.
+Warning: Graph neighbors are unavailable for single hostname/GPU aggregate window; IF candidates are used for 1970187 validation display.
+Warning: Using 15-minute aggregate proxy for g20n07 GPU 0 because raw pre-failure rows are sparse in points_with_jobs_tele_ult.csv.
+Warning: Graph neighbors are unavailable for single hostname/GPU aggregate window; IF candidates are used for 1970187 validation display.
+Warning: Using 15-minute aggregate proxy for f24n16 GPU 0 because raw pre-failure rows are sparse in points_with_jobs_tele_ult.csv.
+Warning: Graph neighbors are unavailable for single hostname/GPU aggregate window; IF candidates are used for 1970187 validation display.
+Warning: Using 15-minute aggregate proxy for a25n02 GPU 5 because raw pre-failure rows are sparse in points_with_jobs_tele_ult.csv.
+Warning: Graph neighbors are unavailable for single hostname/GPU aggregate window; IF candidates are used for 1970187 validation display.
+Warning: Using 15-minute aggregate proxy for g25n13 GPU 5 because raw pre-failure rows are sparse in points_with_jobs_tele_ult.csv.
+Warning: Graph neighbors are unavailable for single hostname/GPU aggregate window; IF candidates are used for 1970187 validation display.
+Warning: Using 15-minute aggregate proxy for h50n06 GPU 2 because raw pre-failure rows are sparse in points_with_jobs_tele_ult.csv.
+Warning: Further validation warnings were suppressed.
+is_failure events: 169
+Telemetry window rows: 1
+Hybrid result rows: 1
+Hybrid anomalies: 1
+host=c04n16 GPU 1 detection=2020-10-15 08:40:19+00:00 error=2020-10-15 08:55:19+00:00 lead_time_sec=900 positive=yes
+host=f02n02 GPU 3 detection=2021-07-17 16:14:30+00:00 error=2021-07-17 16:29:30+00:00 lead_time_sec=900 positive=yes
+host=a25n02 GPU 5 detection=2022-02-06 19:42:03+00:00 error=2022-02-06 19:57:03+00:00 lead_time_sec=900 positive=yes
+host=h28n16 GPU 1 detection=2022-02-06 19:50:31+00:00 error=2022-02-06 20:05:31+00:00 lead_time_sec=900 positive=yes
+host=g20n07 GPU 0 detection=2020-01-23 06:52:27+00:00 error=2020-01-23 07:07:27+00:00 lead_time_sec=900 positive=yes
+host=g20n07 GPU 0 detection=2020-01-23 19:53:42+00:00 error=2020-01-23 20:08:42+00:00 lead_time_sec=900 positive=yes
+host=d11n06 GPU 4 detection=2020-01-19 18:12:35+00:00 error=2020-01-19 18:27:35+00:00 lead_time_sec=900 positive=yes
+host=g20n07 GPU 0 detection=2020-01-19 05:58:56+00:00 error=2020-01-19 06:13:56+00:00 lead_time_sec=900 positive=yes
+host=f24n16 GPU 0 detection=2020-06-15 23:57:35+00:00 error=2020-06-16 00:12:35+00:00 lead_time_sec=900 positive=yes
+host=a25n02 GPU 5 detection=2020-12-14 09:14:31+00:00 error=2020-12-14 09:29:31+00:00 lead_time_sec=900 positive=yes
+host=g25n13 GPU 5 detection=2022-04-30 05:08:04+00:00 error=2022-04-30 05:23:04+00:00 lead_time_sec=900 positive=yes
+host=h50n06 GPU 2 detection=2021-11-18 00:45:13+00:00 error=2021-11-18 01:00:13+00:00 lead_time_sec=900 positive=yes
+host=c02n02 GPU 1 detection=2020-11-21 16:03:25+00:00 error=2020-11-21 16:18:25+00:00 lead_time_sec=900 positive=yes
+host=g08n11 GPU 5 detection=2022-02-14 04:54:56+00:00 error=2022-02-14 05:09:56+00:00 lead_time_sec=900 positive=yes
+host=h29n04 GPU 3 detection=2022-02-14 12:52:52+00:00 error=2022-02-14 13:07:52+00:00 lead_time_sec=900 positive=yes
+host=a05n11 GPU 5 detection=2020-02-01 23:52:42+00:00 error=2020-02-02 00:07:42+00:00 lead_time_sec=900 positive=yes
+host=h50n06 GPU 2 detection=2020-11-23 15:07:26+00:00 error=2020-11-23 15:22:26+00:00 lead_time_sec=900 positive=yes
+host=g32n01 GPU 4 detection=2020-11-16 09:52:34+00:00 error=2020-11-16 10:07:34+00:00 lead_time_sec=900 positive=yes
+host=f24n16 GPU 0 detection=2020-07-21 03:21:14+00:00 error=2020-07-21 03:36:14+00:00 lead_time_sec=900 positive=yes
+host=e36n13 GPU 5 detection=2021-11-19 00:03:38+00:00 error=2021-11-19 00:18:38+00:00 lead_time_sec=900 positive=yes
+host=e36n13 GPU 5 detection=2021-11-21 08:43:43+00:00 error=2021-11-21 08:58:43+00:00 lead_time_sec=900 positive=yes
+host=a29n01 GPU 1 detection=2020-02-21 14:39:22+00:00 error=2020-02-21 14:54:22+00:00 lead_time_sec=900 positive=yes
+host=d11n06 GPU 4 detection=2020-01-18 10:21:37+00:00 error=2020-01-18 10:36:37+00:00 lead_time_sec=900 positive=yes
+host=d11n06 GPU 4 detection=2020-01-18 18:19:00+00:00 error=2020-01-18 18:34:00+00:00 lead_time_sec=900 positive=yes
+host=f24n16 GPU 0 detection=2020-01-18 14:51:27+00:00 error=2020-01-18 15:06:27+00:00 lead_time_sec=900 positive=yes
+host=f21n14 GPU 0 detection=2020-06-14 05:08:53+00:00 error=2020-06-14 05:23:53+00:00 lead_time_sec=900 positive=yes
+host=f24n16 GPU 0 detection=2020-07-31 14:28:53+00:00 error=2020-07-31 14:43:53+00:00 lead_time_sec=900 positive=yes
+host=f24n16 GPU 0 detection=2020-04-17 21:15:03+00:00 error=2020-04-17 21:30:03+00:00 lead_time_sec=900 positive=yes
+host=h28n16 GPU 1 detection=2022-04-28 05:02:15+00:00 error=2022-04-28 05:17:15+00:00 lead_time_sec=900 positive=yes
+host=h28n16 GPU 1 detection=2021-09-06 18:43:19+00:00 error=2021-09-06 18:58:19+00:00 lead_time_sec=900 positive=yes
+host=g27n17 GPU 3 detection=2021-03-28 02:39:16+00:00 error=2021-03-28 02:54:16+00:00 lead_time_sec=900 positive=yes
+host=h10n13 GPU 1 detection=2021-02-07 07:48:55+00:00 error=2021-02-07 08:03:55+00:00 lead_time_sec=900 positive=yes
+host=a17n13 GPU 1 detection=2020-06-07 03:47:38+00:00 error=2020-06-07 04:02:38+00:00 lead_time_sec=900 positive=yes
+host=a17n13 GPU 1 detection=2020-06-07 04:27:52+00:00 error=2020-06-07 04:42:52+00:00 lead_time_sec=900 positive=yes
+host=d17n11 GPU 1 detection=2020-11-14 03:23:57+00:00 error=2020-11-14 03:38:57+00:00 lead_time_sec=900 positive=yes
+host=e30n06 GPU 1 detection=2022-05-10 19:11:49+00:00 error=2022-05-10 19:26:49+00:00 lead_time_sec=900 positive=yes
+host=h10n13 GPU 2 detection=2022-05-10 04:41:31+00:00 error=2022-05-10 04:56:31+00:00 lead_time_sec=900 positive=yes
+host=f24n16 GPU 0 detection=2020-08-17 08:59:37+00:00 error=2020-08-17 09:14:37+00:00 lead_time_sec=900 positive=yes
+host=h10n13 GPU 2 detection=2022-05-07 00:53:15+00:00 error=2022-05-07 01:08:15+00:00 lead_time_sec=900 positive=yes
+host=h10n13 GPU 2 detection=2022-05-07 15:38:07+00:00 error=2022-05-07 15:53:07+00:00 lead_time_sec=900 positive=yes
+host=a04n16 GPU 5 detection=2020-08-13 22:46:57+00:00 error=2020-08-13 23:01:57+00:00 lead_time_sec=900 positive=yes
+host=f11n10 GPU 3 detection=2021-04-10 06:04:30+00:00 error=2021-04-10 06:19:30+00:00 lead_time_sec=900 positive=yes
+host=b34n02 GPU 5 detection=2021-10-14 11:00:26+00:00 error=2021-10-14 11:15:26+00:00 lead_time_sec=900 positive=yes
+host=e12n03 GPU 4 detection=2021-10-14 05:47:14+00:00 error=2021-10-14 06:02:14+00:00 lead_time_sec=900 positive=yes
+host=f24n16 GPU 0 detection=2020-09-22 13:40:32+00:00 error=2020-09-22 13:55:32+00:00 lead_time_sec=900 positive=yes
+host=a25n02 GPU 5 detection=2021-10-17 09:54:17+00:00 error=2021-10-17 10:09:17+00:00 lead_time_sec=900 positive=yes
+host=b03n05 GPU 5 detection=2020-07-23 07:28:23+00:00 error=2020-07-23 07:43:23+00:00 lead_time_sec=900 positive=yes
+host=h28n16 GPU 1 detection=2022-01-27 20:22:14+00:00 error=2022-01-27 20:37:14+00:00 lead_time_sec=900 positive=yes
+host=e12n03 GPU 4 detection=2021-10-26 23:49:50+00:00 error=2021-10-27 00:04:50+00:00 lead_time_sec=900 positive=yes
+host=h50n06 GPU 2 detection=2022-01-24 12:00:08+00:00 error=2022-01-24 12:15:08+00:00 lead_time_sec=900 positive=yes
+host=b05n18 GPU 2 detection=2021-03-04 14:20:40+00:00 error=2021-03-04 14:35:40+00:00 lead_time_sec=900 positive=yes
+host=b05n18 GPU 2 detection=2021-03-04 15:59:29+00:00 error=2021-03-04 16:14:29+00:00 lead_time_sec=900 positive=yes
+host=d09n13 GPU 5 detection=2020-01-26 00:22:49+00:00 error=2020-01-26 00:37:49+00:00 lead_time_sec=900 positive=yes
+host=d11n06 GPU 4 detection=2020-01-26 16:49:58+00:00 error=2020-01-26 17:04:58+00:00 lead_time_sec=900 positive=yes
+host=g16n06 GPU 2 detection=2020-01-26 19:13:14+00:00 error=2020-01-26 19:28:14+00:00 lead_time_sec=900 positive=yes
+host=f24n16 GPU 0 detection=2020-04-03 04:51:15+00:00 error=2020-04-03 05:06:15+00:00 lead_time_sec=900 positive=yes
+host=f24n16 GPU 0 detection=2020-09-18 01:09:54+00:00 error=2020-09-18 01:24:54+00:00 lead_time_sec=900 positive=yes
+host=g36n06 GPU 0 detection=2019-12-31 20:31:22+00:00 error=2019-12-31 20:46:22+00:00 lead_time_sec=900 positive=yes
+host=h50n06 GPU 2 detection=2020-12-24 12:34:41+00:00 error=2020-12-24 12:49:41+00:00 lead_time_sec=900 positive=yes
+host=b36n05 GPU 4 detection=2021-02-17 09:06:46+00:00 error=2021-02-17 09:21:46+00:00 lead_time_sec=900 positive=yes
+host=a17n13 GPU 1 detection=2020-06-09 13:30:40+00:00 error=2020-06-09 13:45:40+00:00 lead_time_sec=900 positive=yes
+host=f24n16 GPU 0 detection=2020-09-05 08:28:52+00:00 error=2020-09-05 08:43:52+00:00 lead_time_sec=900 positive=yes
+host=a17n13 GPU 1 detection=2020-06-08 00:47:17+00:00 error=2020-06-08 01:02:17+00:00 lead_time_sec=900 positive=yes
+host=a17n13 GPU 1 detection=2020-06-08 01:30:04+00:00 error=2020-06-08 01:45:04+00:00 lead_time_sec=900 positive=yes
+host=a17n13 GPU 1 detection=2020-06-08 03:25:18+00:00 error=2020-06-08 03:40:18+00:00 lead_time_sec=900 positive=yes
+host=a02n17 GPU 4 detection=2021-02-25 20:15:08+00:00 error=2021-02-25 20:30:08+00:00 lead_time_sec=900 positive=yes
+host=g25n13 GPU 5 detection=2021-02-25 05:03:08+00:00 error=2021-02-25 05:18:08+00:00 lead_time_sec=900 positive=yes
+host=a25n02 GPU 5 detection=2020-08-27 20:43:49+00:00 error=2020-08-27 20:58:49+00:00 lead_time_sec=900 positive=yes
+host=c04n16 GPU 1 detection=2021-09-27 04:38:07+00:00 error=2021-09-27 04:53:07+00:00 lead_time_sec=900 positive=yes
+host=g30n11 GPU 0 detection=2022-01-16 16:29:05+00:00 error=2022-01-16 16:44:05+00:00 lead_time_sec=900 positive=yes
+host=c31n06 GPU 4 detection=2020-01-17 03:40:05+00:00 error=2020-01-17 03:55:05+00:00 lead_time_sec=900 positive=yes
+host=g20n07 GPU 0 detection=2020-01-17 02:56:04+00:00 error=2020-01-17 03:11:04+00:00 lead_time_sec=900 positive=yes
+host=g20n07 GPU 0 detection=2020-01-17 17:27:16+00:00 error=2020-01-17 17:42:16+00:00 lead_time_sec=900 positive=yes
+host=f24n16 GPU 0 detection=2020-03-31 06:56:12+00:00 error=2020-03-31 07:11:12+00:00 lead_time_sec=900 positive=yes
+host=d22n08 GPU 4 detection=2020-10-12 04:45:21+00:00 error=2020-10-12 05:00:21+00:00 lead_time_sec=900 positive=yes
+host=h50n06 GPU 2 detection=2021-09-05 13:14:50+00:00 error=2021-09-05 13:29:50+00:00 lead_time_sec=900 positive=yes
+host=f24n16 GPU 0 detection=2020-05-30 05:56:19+00:00 error=2020-05-30 06:11:19+00:00 lead_time_sec=900 positive=yes
+host=h10n13 GPU 2 detection=2022-05-14 23:05:16+00:00 error=2022-05-14 23:20:16+00:00 lead_time_sec=900 positive=yes
+host=f24n16 GPU 0 detection=2020-06-20 07:30:51+00:00 error=2020-06-20 07:45:51+00:00 lead_time_sec=900 positive=yes
+host=f24n16 GPU 0 detection=2020-09-04 18:25:22+00:00 error=2020-09-04 18:40:22+00:00 lead_time_sec=900 positive=yes
+host=d21n16 GPU 1 detection=2021-03-25 17:38:12+00:00 error=2021-03-25 17:53:12+00:00 lead_time_sec=900 positive=yes
+host=c32n12 GPU 0 detection=2021-03-08 05:14:05+00:00 error=2021-03-08 05:29:05+00:00 lead_time_sec=900 positive=yes
+host=f01n05 GPU 2 detection=2020-09-21 00:51:43+00:00 error=2020-09-21 01:06:43+00:00 lead_time_sec=900 positive=yes
+host=f24n16 GPU 0 detection=2020-09-21 09:04:59+00:00 error=2020-09-21 09:19:59+00:00 lead_time_sec=900 positive=yes
+host=a09n11 GPU 3 detection=2021-07-29 02:08:08+00:00 error=2021-07-29 02:23:08+00:00 lead_time_sec=900 positive=yes
+host=g36n06 GPU 0 detection=2020-01-13 19:41:57+00:00 error=2020-01-13 19:56:57+00:00 lead_time_sec=900 positive=yes
+host=e36n13 GPU 5 detection=2021-10-15 05:14:32+00:00 error=2021-10-15 05:29:32+00:00 lead_time_sec=900 positive=yes
+host=h28n16 GPU 1 detection=2022-01-14 21:48:51+00:00 error=2022-01-14 22:03:51+00:00 lead_time_sec=900 positive=yes
+host=e28n18 GPU 0 detection=2021-03-02 02:58:45+00:00 error=2021-03-02 03:13:45+00:00 lead_time_sec=900 positive=yes
+host=f24n16 GPU 0 detection=2020-07-03 13:47:59+00:00 error=2020-07-03 14:02:59+00:00 lead_time_sec=900 positive=yes
+host=c32n15 GPU 0 detection=2021-10-11 21:19:59+00:00 error=2021-10-11 21:34:59+00:00 lead_time_sec=900 positive=yes
+host=e12n03 GPU 4 detection=2021-10-11 01:09:36+00:00 error=2021-10-11 01:24:36+00:00 lead_time_sec=900 positive=yes
+host=b15n09 GPU 5 detection=2021-09-29 05:34:37+00:00 error=2021-09-29 05:49:37+00:00 lead_time_sec=900 positive=yes
+host=b15n09 GPU 5 detection=2021-09-29 05:34:38+00:00 error=2021-09-29 05:49:38+00:00 lead_time_sec=900 positive=yes
+host=h28n16 GPU 1 detection=2022-01-08 12:30:38+00:00 error=2022-01-08 12:45:38+00:00 lead_time_sec=900 positive=yes
+host=c31n06 GPU 4 detection=2021-01-03 01:47:09+00:00 error=2021-01-03 02:02:09+00:00 lead_time_sec=900 positive=yes
+host=a20n10 GPU 0 detection=2022-02-13 00:50:02+00:00 error=2022-02-13 01:05:02+00:00 lead_time_sec=900 positive=yes
+host=a20n10 GPU 0 detection=2022-02-13 00:50:10+00:00 error=2022-02-13 01:05:10+00:00 lead_time_sec=900 positive=yes
+host=h50n06 GPU 2 detection=2020-12-07 15:33:48+00:00 error=2020-12-07 15:48:48+00:00 lead_time_sec=900 positive=yes
+host=f24n16 GPU 0 detection=2020-06-10 11:52:53+00:00 error=2020-06-10 12:07:53+00:00 lead_time_sec=900 positive=yes
+host=d15n01 GPU 5 detection=2021-01-21 21:41:41+00:00 error=2021-01-21 21:56:41+00:00 lead_time_sec=900 positive=yes
+host=a09n04 GPU 2 detection=2020-04-24 11:49:09+00:00 error=2020-04-24 12:04:09+00:00 lead_time_sec=900 positive=yes
+host=c32n11 GPU 5 detection=2021-03-22 01:26:37+00:00 error=2021-03-22 01:41:37+00:00 lead_time_sec=900 positive=yes
+host=c31n06 GPU 4 detection=2021-01-16 08:14:47+00:00 error=2021-01-16 08:29:47+00:00 lead_time_sec=900 positive=yes
+host=f29n12 GPU 3 detection=2020-10-22 07:06:52+00:00 error=2020-10-22 07:21:52+00:00 lead_time_sec=900 positive=yes
+host=d23n11 GPU 5 detection=2020-10-04 08:47:25+00:00 error=2020-10-04 09:02:25+00:00 lead_time_sec=900 positive=yes
+host=f24n16 GPU 0 detection=2020-06-18 10:32:05+00:00 error=2020-06-18 10:47:05+00:00 lead_time_sec=900 positive=yes
+host=g25n12 GPU 2 detection=2020-09-26 02:41:05+00:00 error=2020-09-26 02:56:05+00:00 lead_time_sec=900 positive=yes
+host=h50n06 GPU 2 detection=2020-08-18 03:17:57+00:00 error=2020-08-18 03:32:57+00:00 lead_time_sec=900 positive=yes
+host=e12n03 GPU 4 detection=2021-10-04 16:00:35+00:00 error=2021-10-04 16:15:35+00:00 lead_time_sec=900 positive=yes
+host=g36n08 GPU 2 detection=2020-11-22 08:51:32+00:00 error=2020-11-22 09:06:32+00:00 lead_time_sec=900 positive=yes
+host=g20n07 GPU 0 detection=2020-01-25 00:37:42+00:00 error=2020-01-25 00:52:42+00:00 lead_time_sec=900 positive=yes
+host=c29n10 GPU 5 detection=2021-01-15 22:39:44+00:00 error=2021-01-15 22:54:44+00:00 lead_time_sec=900 positive=yes
+host=c27n03 GPU 5 detection=2021-10-08 18:14:37+00:00 error=2021-10-08 18:29:37+00:00 lead_time_sec=900 positive=yes
+host=f28n10 GPU 3 detection=2021-10-08 05:25:55+00:00 error=2021-10-08 05:40:55+00:00 lead_time_sec=900 positive=yes
+host=g36n18 GPU 1 detection=2021-04-11 12:57:42+00:00 error=2021-04-11 13:12:42+00:00 lead_time_sec=900 positive=yes
+host=e12n03 GPU 4 detection=2021-10-16 12:38:51+00:00 error=2021-10-16 12:53:51+00:00 lead_time_sec=900 positive=yes
+host=f24n16 GPU 0 detection=2020-07-14 03:48:05+00:00 error=2020-07-14 04:03:05+00:00 lead_time_sec=900 positive=yes
+host=a17n15 GPU 5 detection=2022-05-03 08:57:58+00:00 error=2022-05-03 09:12:58+00:00 lead_time_sec=900 positive=yes
+host=b06n07 GPU 3 detection=2022-02-09 02:34:41+00:00 error=2022-02-09 02:49:41+00:00 lead_time_sec=900 positive=yes
+host=f24n16 GPU 0 detection=2020-08-24 15:06:19+00:00 error=2020-08-24 15:21:19+00:00 lead_time_sec=900 positive=yes
+host=b16n15 GPU 2 detection=2021-03-15 16:15:34+00:00 error=2021-03-15 16:30:34+00:00 lead_time_sec=900 positive=yes
+host=b14n07 GPU 2 detection=2020-06-21 18:29:15+00:00 error=2020-06-21 18:44:15+00:00 lead_time_sec=900 positive=yes
+host=e36n13 GPU 5 detection=2021-11-16 20:34:07+00:00 error=2021-11-16 20:49:07+00:00 lead_time_sec=900 positive=yes
+host=a22n16 GPU 4 detection=2020-06-05 02:41:29+00:00 error=2020-06-05 02:56:29+00:00 lead_time_sec=900 positive=yes
+host=f24n16 GPU 0 detection=2020-08-05 00:01:07+00:00 error=2020-08-05 00:16:07+00:00 lead_time_sec=900 positive=yes
+host=c04n16 GPU 1 detection=2021-09-03 21:20:08+00:00 error=2021-09-03 21:35:08+00:00 lead_time_sec=900 positive=yes
+host=f24n16 GPU 0 detection=2020-05-06 08:49:23+00:00 error=2020-05-06 09:04:23+00:00 lead_time_sec=900 positive=yes
+host=f11n10 GPU 3 detection=2021-12-03 23:23:59+00:00 error=2021-12-03 23:38:59+00:00 lead_time_sec=900 positive=yes
+host=b28n01 GPU 2 detection=2021-04-19 03:40:55+00:00 error=2021-04-19 03:55:55+00:00 lead_time_sec=900 positive=yes
+host=a25n02 GPU 5 detection=2020-10-23 06:56:51+00:00 error=2020-10-23 07:11:51+00:00 lead_time_sec=900 positive=yes
+host=b34n09 GPU 0 detection=2020-10-23 04:38:00+00:00 error=2020-10-23 04:53:00+00:00 lead_time_sec=900 positive=yes
+host=c31n06 GPU 4 detection=2021-09-07 09:04:24+00:00 error=2021-09-07 09:19:24+00:00 lead_time_sec=900 positive=yes
+host=f24n16 GPU 0 detection=2020-08-21 06:26:48+00:00 error=2020-08-21 06:41:48+00:00 lead_time_sec=900 positive=yes
+host=f07n03 GPU 4 detection=2022-02-10 05:00:52+00:00 error=2022-02-10 05:15:52+00:00 lead_time_sec=900 positive=yes
+host=h29n04 GPU 3 detection=2022-02-10 19:29:19+00:00 error=2022-02-10 19:44:19+00:00 lead_time_sec=900 positive=yes
+host=f07n07 GPU 3 detection=2020-01-16 11:39:53+00:00 error=2020-01-16 11:54:53+00:00 lead_time_sec=900 positive=yes
+host=e35n06 GPU 0 detection=2020-08-29 18:18:44+00:00 error=2020-08-29 18:33:44+00:00 lead_time_sec=900 positive=yes
+host=e12n03 GPU 4 detection=2021-10-23 02:50:55+00:00 error=2021-10-23 03:05:55+00:00 lead_time_sec=900 positive=yes
+host=f31n08 GPU 3 detection=2021-10-20 22:29:32+00:00 error=2021-10-20 22:44:32+00:00 lead_time_sec=900 positive=yes
+host=f24n16 GPU 0 detection=2020-07-19 02:50:02+00:00 error=2020-07-19 03:05:02+00:00 lead_time_sec=900 positive=yes
+host=f01n14 GPU 1 detection=2022-04-26 00:23:52+00:00 error=2022-04-26 00:38:52+00:00 lead_time_sec=900 positive=yes
+host=f01n14 GPU 1 detection=2022-04-26 00:23:53+00:00 error=2022-04-26 00:38:53+00:00 lead_time_sec=900 positive=yes
+host=h29n04 GPU 3 detection=2022-02-11 11:58:21+00:00 error=2022-02-11 12:13:21+00:00 lead_time_sec=900 positive=yes
+host=h29n04 GPU 3 detection=2022-02-11 18:49:18+00:00 error=2022-02-11 19:04:18+00:00 lead_time_sec=900 positive=yes
+host=e12n03 GPU 4 detection=2021-09-24 10:46:36+00:00 error=2021-09-24 11:01:36+00:00 lead_time_sec=900 positive=yes
+host=h29n01 GPU 5 detection=2020-09-14 23:48:45+00:00 error=2020-09-15 00:03:45+00:00 lead_time_sec=900 positive=yes
+host=h50n06 GPU 2 detection=2021-11-08 13:40:30+00:00 error=2021-11-08 13:55:30+00:00 lead_time_sec=900 positive=yes
+host=h50n06 GPU 2 detection=2021-11-08 13:40:34+00:00 error=2021-11-08 13:55:34+00:00 lead_time_sec=900 positive=yes
+host=a29n18 GPU 2 detection=2020-01-21 15:23:53+00:00 error=2020-01-21 15:38:53+00:00 lead_time_sec=900 positive=yes
+host=g20n07 GPU 0 detection=2020-01-21 14:21:44+00:00 error=2020-01-21 14:36:44+00:00 lead_time_sec=900 positive=yes
+host=g20n07 GPU 0 detection=2020-01-21 15:47:46+00:00 error=2020-01-21 16:02:46+00:00 lead_time_sec=900 positive=yes
+host=g20n07 GPU 0 detection=2020-01-21 16:15:34+00:00 error=2020-01-21 16:30:34+00:00 lead_time_sec=900 positive=yes
+host=g20n07 GPU 0 detection=2020-01-21 16:46:02+00:00 error=2020-01-21 17:01:02+00:00 lead_time_sec=900 positive=yes
+host=g20n07 GPU 0 detection=2020-01-21 17:29:39+00:00 error=2020-01-21 17:44:39+00:00 lead_time_sec=900 positive=yes
+host=g20n07 GPU 0 detection=2020-01-21 19:39:29+00:00 error=2020-01-21 19:54:29+00:00 lead_time_sec=900 positive=yes
+host=g20n07 GPU 0 detection=2020-01-21 20:17:14+00:00 error=2020-01-21 20:32:14+00:00 lead_time_sec=900 positive=yes
+host=g20n07 GPU 0 detection=2020-01-21 20:51:37+00:00 error=2020-01-21 21:06:37+00:00 lead_time_sec=900 positive=yes
+host=g14n06 GPU 5 detection=2021-10-03 11:34:32+00:00 error=2021-10-03 11:49:32+00:00 lead_time_sec=900 positive=yes
+host=f24n16 GPU 0 detection=2020-09-19 20:27:44+00:00 error=2020-09-19 20:42:44+00:00 lead_time_sec=900 positive=yes
+host=b32n04 GPU 0 detection=2020-04-29 18:38:23+00:00 error=2020-04-29 18:53:23+00:00 lead_time_sec=900 positive=yes
+host=g04n08 GPU 2 detection=2021-02-18 04:14:54+00:00 error=2021-02-18 04:29:54+00:00 lead_time_sec=900 positive=yes
+host=g04n08 GPU 2 detection=2021-02-18 14:04:10+00:00 error=2021-02-18 14:19:10+00:00 lead_time_sec=900 positive=yes
+host=g04n08 GPU 2 detection=2021-02-18 15:11:09+00:00 error=2021-02-18 15:26:09+00:00 lead_time_sec=900 positive=yes
+host=g04n08 GPU 2 detection=2021-02-18 16:35:04+00:00 error=2021-02-18 16:50:04+00:00 lead_time_sec=900 positive=yes
+host=f24n16 GPU 0 detection=2020-07-17 04:00:11+00:00 error=2020-07-17 04:15:11+00:00 lead_time_sec=900 positive=yes
+host=h28n16 GPU 1 detection=2021-10-13 11:25:01+00:00 error=2021-10-13 11:40:01+00:00 lead_time_sec=900 positive=yes
+host=f24n16 GPU 0 detection=2020-05-05 10:35:08+00:00 error=2020-05-05 10:50:08+00:00 lead_time_sec=900 positive=yes
+host=f24n16 GPU 0 detection=2020-01-27 14:26:36+00:00 error=2020-01-27 14:41:36+00:00 lead_time_sec=900 positive=yes

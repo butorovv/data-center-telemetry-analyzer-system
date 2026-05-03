@@ -6,6 +6,7 @@
 
 #include <cstdint>
 #include <filesystem>
+#include <string>
 #include <vector>
 
 namespace telemetry {
@@ -25,12 +26,36 @@ struct FailureValidationOptions {
     std::filesystem::path locationsPath;
     int xidCode = 94;
     int lookbackMinutes = 20;
+    int validationWindowMinutes = 15;
     double anomalyThreshold = 0.75;
+    std::string validationAlgorithm = "hybrid";
     // 0 means validate all is_failure rows.
     std::size_t maxEvents = 0;
-    bool allowAggregateProxy = true;
     CancellationToken* cancellation = nullptr;
     ProgressCallback progress;
+};
+
+struct FailureValidationSummary {
+    std::size_t totalRows = 0;
+    std::size_t totalFailureRows = 0;
+    std::size_t validFailureRows = 0;
+    std::size_t skippedFailureRows = 0;
+    std::size_t missingTimestamp = 0;
+    std::size_t missingHostOrGpu = 0;
+    std::size_t missingRequiredFeatures = 0;
+    std::size_t nonFiniteNumericValues = 0;
+    std::size_t processedEvents = 0;
+    std::size_t positiveCount = 0;
+    std::size_t negativeCount = 0;
+    std::size_t proxyUsed = 0;
+    double detectionRate = 0.0;
+    double threshold = 0.75;
+    std::string algorithm = "hybrid";
+    double meanScorePositive = 0.0;
+    double meanScoreNegative = 0.0;
+    int windowMinutes = 15;
+    int leadTimeSeconds = 900;
+    std::string windowType = "15min";
 };
 
 struct FailureValidationResult {
@@ -41,6 +66,7 @@ struct FailureValidationResult {
     GraphContext graph;
     DetectorResult hybridResult;
     std::vector<LeadTimeResult> leadTimes;
+    FailureValidationSummary summary;
     std::vector<std::string> warnings;
 };
 

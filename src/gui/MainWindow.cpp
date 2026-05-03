@@ -22,16 +22,66 @@
 #include <QPushButton>
 #include <QStandardItemModel>
 #include <QStatusBar>
+#include <QStringList>
 #include <QTabWidget>
 #include <QTableView>
 #include <QTextStream>
 #include <QVBoxLayout>
+
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QStringConverter>
+#endif
 
 #include <algorithm>
 #include <cmath>
 
 namespace telemetry::gui {
 
+namespace {
+
+QString csvCell(const QString& value)
+{
+    QString escaped = value;
+    escaped.replace(QStringLiteral("\""), QStringLiteral("\"\""));
+    return QStringLiteral("\"") + escaped + QStringLiteral("\"");
+}
+
+void configureCsvStream(QTextStream& out)
+{
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    out.setEncoding(QStringConverter::Utf8);
+#else
+    out.setCodec("UTF-8");
+#endif
+}
+
+void writeCsvModel(QTextStream& out, const QStringList& headers, QStandardItemModel* model)
+{
+    for (int col = 0; col < headers.size(); ++col) {
+        if (col != 0) {
+            out << ',';
+        }
+        out << csvCell(headers[col]);
+    }
+    out << "\n";
+
+    if (model == nullptr) {
+        return;
+    }
+
+    for (int row = 0; row < model->rowCount(); ++row) {
+        for (int col = 0; col < model->columnCount(); ++col) {
+            if (col != 0) {
+                out << ',';
+            }
+            const QStandardItem* item = model->item(row, col);
+            out << csvCell(item != nullptr ? item->text() : QString());
+        }
+        out << "\n";
+    }
+}
+
+} // namespace
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
 {
@@ -106,17 +156,9 @@ QWidget* MainWindow::createAnalyzeTab()
         QStringLiteral("Hybrid")
     });
 
-    thresholdSpin_ = new QDoubleSpinBox(page);
-    thresholdSpin_->setRange(0.0, 1.0);
-    thresholdSpin_->setSingleStep(0.01);
-    thresholdSpin_->setDecimals(2);
-    thresholdSpin_->setValue(0.75);
-
     analyzeButton_ = new QPushButton(QStringLiteral("Запустить"), page);
     controls->addWidget(new QLabel(QStringLiteral("Алгоритм:"), page));
     controls->addWidget(algorithmCombo_);
-    controls->addWidget(new QLabel(QStringLiteral("Порог IF:"), page));
-    controls->addWidget(thresholdSpin_);
     controls->addWidget(analyzeButton_);
     controls->addStretch();
     layout->addLayout(controls);
@@ -154,11 +196,18 @@ QWidget* MainWindow::createResultsTab()
 
     leadTimeModel_ = new QStandardItemModel(this);
     leadTimeModel_->setHorizontalHeaderLabels({
-        QStringLiteral("Хост"),
-        QStringLiteral("Обнаружение"),
-        QStringLiteral("Сбой DBE"),
-        QStringLiteral("Lead time, сек"),
-        QStringLiteral("> 0")
+        QStringLiteral("host"),
+        QStringLiteral("GPU"),
+        QStringLiteral("failure_time"),
+        QStringLiteral("window_type"),
+        QStringLiteral("threshold"),
+        QStringLiteral("detection_time"),
+        QStringLiteral("lead_time_sec"),
+        QStringLiteral("positive"),
+        QStringLiteral("algorithm_detected"),
+        QStringLiteral("if_score"),
+        QStringLiteral("if_detected"),
+        QStringLiteral("hybrid_detected")
     });
     leadTimeTable_ = new QTableView(page);
     leadTimeTable_->setModel(leadTimeModel_);
@@ -186,17 +235,42 @@ QWidget* MainWindow::createResultsTab()
     layout->addLayout(validationForm);
 
     auto* buttons = new QHBoxLayout();
-    validateButton_ = new QPushButton(QStringLiteral("Валидация 1970187"), page);
-    auto* exportButton = new QPushButton(QStringLiteral("Экспорт CSV"), page);
+    validationAlgorithmCombo_ = new QComboBox(page);
+    validationAlgorithmCombo_->addItem(QStringLiteral("isolation_forest"), QStringLiteral("isolation_forest"));
+    validationAlgorithmCombo_->addItem(QStringLiteral("hybrid"), QStringLiteral("hybrid"));
+    validationAlgorithmCombo_->setCurrentIndex(1);
+    validationWindowCombo_ = new QComboBox(page);
+    validationWindowCombo_->addItem(QStringLiteral("1 min"), 1);
+    validationWindowCombo_->addItem(QStringLiteral("5 min"), 5);
+    validationWindowCombo_->addItem(QStringLiteral("15 min"), 15);
+    validationWindowCombo_->setCurrentIndex(2);
+
+    thresholdSpin_ = new QDoubleSpinBox(page);
+    thresholdSpin_->setRange(0.0, 1.0);
+    thresholdSpin_->setSingleStep(0.01);
+    thresholdSpin_->setDecimals(2);
+    thresholdSpin_->setValue(0.75);
+
+    validateButton_ = new QPushButton(QStringLiteral("\u0412\u0430\u043b\u0438\u0434\u0430\u0446\u0438\u044f 1970187"), page);
+    auto* exportAnomaliesButton = new QPushButton(QStringLiteral("\u042d\u043a\u0441\u043f\u043e\u0440\u0442 \u0430\u043d\u043e\u043c\u0430\u043b\u0438\u0439 CSV"), page);
+    auto* exportValidationButton = new QPushButton(QStringLiteral("\u042d\u043a\u0441\u043f\u043e\u0440\u0442 \u0432\u0430\u043b\u0438\u0434\u0430\u0446\u0438\u0438 CSV"), page);
+    buttons->addWidget(new QLabel(QStringLiteral("Validation algorithm"), page));
+    buttons->addWidget(validationAlgorithmCombo_);
+    buttons->addWidget(new QLabel(QStringLiteral("\u041e\u043a\u043d\u043e"), page));
+    buttons->addWidget(validationWindowCombo_);
+    buttons->addWidget(new QLabel(QStringLiteral("IF threshold"), page));
+    buttons->addWidget(thresholdSpin_);
     buttons->addWidget(validateButton_);
-    buttons->addWidget(exportButton);
+    buttons->addWidget(exportAnomaliesButton);
+    buttons->addWidget(exportValidationButton);
     buttons->addStretch();
     layout->addLayout(buttons);
 
     connect(browseFailures, &QPushButton::clicked, this, &MainWindow::chooseFailuresFile);
     connect(browsePoints, &QPushButton::clicked, this, &MainWindow::chooseValidationTelemetryFile);
     connect(validateButton_, &QPushButton::clicked, this, &MainWindow::startValidation);
-    connect(exportButton, &QPushButton::clicked, this, &MainWindow::exportResultsCsv);
+    connect(exportAnomaliesButton, &QPushButton::clicked, this, &MainWindow::exportResultsCsv);
+    connect(exportValidationButton, &QPushButton::clicked, this, &MainWindow::exportValidationCsv);
     return page;
 }
 
@@ -325,8 +399,17 @@ void MainWindow::startValidation()
     resultsModel_->removeRows(0, resultsModel_->rowCount());
     leadTimeModel_->removeRows(0, leadTimeModel_->rowCount());
     leadTimeDetectionTimestamps_.clear();
-    appendLog(QStringLiteral("Запуск валидации 1970187 по is_failure == 1."));
-    statusBar()->showMessage(QStringLiteral("Выполняется валидация 1970187..."));
+    const int validationWindowMinutes = validationWindowCombo_ != nullptr
+        ? validationWindowCombo_->currentData().toInt()
+        : 15;
+    const QString validationAlgorithm = validationAlgorithmCombo_ != nullptr
+        ? validationAlgorithmCombo_->currentData().toString()
+        : QStringLiteral("hybrid");
+    appendLog(QStringLiteral("\u0417\u0430\u043f\u0443\u0441\u043a \u0432\u0430\u043b\u0438\u0434\u0430\u0446\u0438\u0438 1970187: algorithm=%1, threshold=%2, \u043e\u043a\u043d\u043e=%3 min.")
+        .arg(validationAlgorithm)
+        .arg(thresholdSpin_->value(), 0, 'f', 4)
+        .arg(validationWindowMinutes));
+    statusBar()->showMessage(QStringLiteral("\u0412\u044b\u043f\u043e\u043b\u043d\u044f\u0435\u0442\u0441\u044f \u0432\u0430\u043b\u0438\u0434\u0430\u0446\u0438\u044f 1970187..."));
     if (tabs_) {
         tabs_->setCurrentIndex(2);
     }
@@ -334,7 +417,9 @@ void MainWindow::startValidation()
         failuresPathEdit_->text(),
         validationTelemetryPathEdit_->text(),
         locationsPathEdit_->text(),
-        thresholdSpin_->value());
+        validationAlgorithm,
+        thresholdSpin_->value(),
+        validationWindowMinutes);
     progressBar_->setValue(0);
     setBusy(true);
     currentThread_->start();
@@ -350,28 +435,64 @@ void MainWindow::cancelCurrentOperation()
 
 void MainWindow::exportResultsCsv()
 {
-    const QString path = QFileDialog::getSaveFileName(this, QStringLiteral("Экспорт результатов"), QStringLiteral("anomaly_results_gui.csv"));
+    const QString path = QFileDialog::getSaveFileName(this, QStringLiteral("\u042d\u043a\u0441\u043f\u043e\u0440\u0442 \u0430\u043d\u043e\u043c\u0430\u043b\u0438\u0439"), QStringLiteral("anomaly_results_gui.csv"));
     if (path.isEmpty()) {
         return;
     }
 
     QFile file(path);
     if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
-        QMessageBox::warning(this, QStringLiteral("Ошибка"), QStringLiteral("Не удалось создать CSV."));
+        QMessageBox::warning(this, QStringLiteral("\u041e\u0448\u0438\u0431\u043a\u0430"), QStringLiteral("\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0441\u043e\u0437\u0434\u0430\u0442\u044c CSV."));
         return;
     }
 
     QTextStream out(&file);
-    out << "raw_id,timestamp,hostname,algorithm,is_anomaly,score\n";
-    for (int row = 0; row < resultsModel_->rowCount(); ++row) {
-        for (int col = 0; col < resultsModel_->columnCount(); ++col) {
-            if (col != 0) {
-                out << ',';
-            }
-            out << resultsModel_->item(row, col)->text();
-        }
-        out << '\n';
+    configureCsvStream(out);
+    writeCsvModel(
+        out,
+        {
+            QStringLiteral("raw_id"),
+            QStringLiteral("timestamp"),
+            QStringLiteral("hostname"),
+            QStringLiteral("algorithm"),
+            QStringLiteral("is_anomaly"),
+            QStringLiteral("score")
+        },
+        resultsModel_);
+}
+
+void MainWindow::exportValidationCsv()
+{
+    const QString path = QFileDialog::getSaveFileName(this, QStringLiteral("\u042d\u043a\u0441\u043f\u043e\u0440\u0442 \u0432\u0430\u043b\u0438\u0434\u0430\u0446\u0438\u0438 1970187"), QStringLiteral("validation_1970187_results.csv"));
+    if (path.isEmpty()) {
+        return;
     }
+
+    QFile file(path);
+    if (!file.open(QIODevice::WriteOnly | QIODevice::Text)) {
+        QMessageBox::warning(this, QStringLiteral("\u041e\u0448\u0438\u0431\u043a\u0430"), QStringLiteral("\u041d\u0435 \u0443\u0434\u0430\u043b\u043e\u0441\u044c \u0441\u043e\u0437\u0434\u0430\u0442\u044c CSV."));
+        return;
+    }
+
+    QTextStream out(&file);
+    configureCsvStream(out);
+    writeCsvModel(
+        out,
+        {
+            QStringLiteral("host"),
+            QStringLiteral("gpu"),
+            QStringLiteral("failure_time"),
+            QStringLiteral("window_type"),
+            QStringLiteral("threshold"),
+            QStringLiteral("detection_time"),
+            QStringLiteral("lead_time_sec"),
+            QStringLiteral("positive"),
+            QStringLiteral("algorithm_detected"),
+            QStringLiteral("if_score"),
+            QStringLiteral("if_detected"),
+            QStringLiteral("hybrid_detected")
+        },
+        leadTimeModel_);
 }
 
 void MainWindow::centerChartOnSelectedRow(const QModelIndex& index)
@@ -427,6 +548,24 @@ void MainWindow::attachThreadSignals(ExecutionThread* thread)
     connect(thread, &ExecutionThread::chartReset, this, &MainWindow::resetChartData);
     connect(thread, &ExecutionThread::chartPoint, this, &MainWindow::addChartPoint);
     connect(thread, &ExecutionThread::leadTimeRow, this, &MainWindow::addLeadTimeRow);
+    connect(thread, &ExecutionThread::validationFinished, this, [this](const QString& algorithm, int positive, int negative, double detectionRate, double ms) {
+        setBusy(false);
+        appendLog(QStringLiteral("Validation %1: positive=%2 negative=%3 detection_rate=%4 time_ms=%5")
+            .arg(algorithm)
+            .arg(positive)
+            .arg(negative)
+            .arg(detectionRate, 0, 'f', 4)
+            .arg(ms));
+        const QString message = QStringLiteral("\u0412\u0430\u043b\u0438\u0434\u0430\u0446\u0438\u044f \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u0430. \u041f\u043e\u043b\u043e\u0436\u0438\u0442\u0435\u043b\u044c\u043d\u044b\u0445 \u0441\u0440\u0430\u0431\u0430\u0442\u044b\u0432\u0430\u043d\u0438\u0439: %1, \u043e\u0442\u0440\u0438\u0446\u0430\u0442\u0435\u043b\u044c\u043d\u044b\u0445: %2.")
+            .arg(positive)
+            .arg(negative);
+        statusBar()->showMessage(message);
+        rebuildChart();
+        if (tabs_) {
+            tabs_->setCurrentIndex(2);
+        }
+        QMessageBox::information(this, QStringLiteral("\u0412\u0430\u043b\u0438\u0434\u0430\u0446\u0438\u044f \u0437\u0430\u0432\u0435\u0440\u0448\u0435\u043d\u0430"), message);
+    });
     connect(thread, &QThread::finished, this, [this]() {
         setBusy(false);
     });
@@ -463,6 +602,9 @@ void MainWindow::addResultRow(int rawIndex, const QString& timestamp, const QStr
 void MainWindow::resetChartData(const QString& metricName)
 {
     chartMetricName_ = metricName;
+    chartXAxisTitle_ = metricName == QStringLiteral("lead_time_sec")
+        ? QStringLiteral("failure_time (unix sec)")
+        : QStringLiteral("raw_id");
     chartRawIndices_.clear();
     chartTimestamps_.clear();
     chartValues_.clear();
@@ -477,16 +619,25 @@ void MainWindow::addChartPoint(int rawIndex, const QString& timestamp, double va
     chartAnomalies_.push_back(isAnomaly);
 }
 
-void MainWindow::addLeadTimeRow(const QString& hostname, const QString& detection,
-                                const QString& error, double leadTimeSeconds, bool positive)
+void MainWindow::addLeadTimeRow(const QString& hostname, int gpu, const QString& failureTimestamp,
+                                const QString& windowType, double threshold, const QString& detectionTimestamp,
+                                double leadTimeSeconds, bool positive, bool algorithmDetected,
+                                double ifScore, bool ifDetected, bool hybridDetected)
 {
-    leadTimeDetectionTimestamps_.push_back(detection);
+    leadTimeDetectionTimestamps_.push_back(detectionTimestamp);
     QList<QStandardItem*> row;
     row << new QStandardItem(hostname)
-        << new QStandardItem(detection)
-        << new QStandardItem(error)
+        << new QStandardItem(gpu >= 0 ? QString::number(gpu) : QStringLiteral("-"))
+        << new QStandardItem(failureTimestamp)
+        << new QStandardItem(windowType)
+        << new QStandardItem(QString::number(threshold, 'f', 4))
+        << new QStandardItem(detectionTimestamp)
         << new QStandardItem(QString::number(leadTimeSeconds, 'f', 2))
-        << new QStandardItem(positive ? QStringLiteral("да") : QStringLiteral("нет"));
+        << new QStandardItem(positive ? QStringLiteral("\u0434\u0430") : QStringLiteral("\u043d\u0435\u0442"))
+        << new QStandardItem(algorithmDetected ? QStringLiteral("\u0434\u0430") : QStringLiteral("\u043d\u0435\u0442"))
+        << new QStandardItem(QString::number(ifScore, 'f', 4))
+        << new QStandardItem(ifDetected ? QStringLiteral("\u0434\u0430") : QStringLiteral("\u043d\u0435\u0442"))
+        << new QStandardItem(hybridDetected ? QStringLiteral("\u0434\u0430") : QStringLiteral("\u043d\u0435\u0442"));
     leadTimeModel_->appendRow(row);
     rebuildChart();
 }
@@ -551,7 +702,7 @@ void MainWindow::rebuildChart(int centerRawIndex)
 
     auto* axisX = new QValueAxis(chart);
     auto* axisY = new QValueAxis(chart);
-    axisX->setTitleText(QStringLiteral("raw_id"));
+    axisX->setTitleText(chartXAxisTitle_);
     axisY->setTitleText(chartMetricName_);
 
     if (!chartRawIndices_.isEmpty()) {

@@ -39,6 +39,8 @@ struct Options {
     bool validate1970187 = false;
     bool injectSynthetic = true;
     double anomalyThreshold = 0.75;
+    int validationWindowMinutes = 15;
+    std::string validationAlgorithm = "hybrid";
     std::string plotMetric;
     std::string plotHost;
 };
@@ -53,7 +55,8 @@ void printUsage()
         << "                     [--xid-log log.csv] [--no-synthetic]\n"
         << "                     [--threshold 0.75] [--limit N] [--threads N] [--window N] [--plot]\n"
         << "  telemetry_analyzer --validate-1970187 [--points points_with_jobs_tele_ult.csv]\n"
-        << "                     [--threshold 0.75]\n\n"
+        << "                     [--threshold 0.75] [--validation-window 1|5|15]\n"
+        << "                     [--validation-algorithm isolation_forest|hybrid]\n\n"
         << "--csv is kept as an alias for --input. If no input is given, the interactive menu is started.\n";
 }
 
@@ -88,6 +91,12 @@ Options parseOptions(int argc, char** argv)
         } else if (arg == "--validate-1970187") {
             options.validate1970187 = true;
             options.injectSynthetic = false;
+        } else if (arg == "--validation-window" || arg == "--validation-window-minutes") {
+            options.validationWindowMinutes = std::stoi(requireValue(arg));
+            options.validate1970187 = true;
+        } else if (arg == "--validation-algorithm") {
+            options.validationAlgorithm = requireValue(arg);
+            options.validate1970187 = true;
         } else if (arg == "--threshold") {
             options.anomalyThreshold = std::stod(requireValue(arg));
         } else if (arg == "--postgres") {
@@ -349,6 +358,8 @@ int runValidation1970187(const Options& options)
     validationOptions.xidCode = 94;
     validationOptions.lookbackMinutes = 20;
     validationOptions.anomalyThreshold = options.anomalyThreshold;
+    validationOptions.validationWindowMinutes = options.validationWindowMinutes;
+    validationOptions.validationAlgorithm = options.validationAlgorithm;
     validationOptions.maxEvents = 0;
     CancellationToken token;
     validationOptions.cancellation = &token;
@@ -363,25 +374,51 @@ int runValidation1970187(const Options& options)
     for (const auto& warning : validation.warnings) {
         std::cout << "Warning: " << warning << '\n';
     }
-    std::cout << "is_failure events: " << validation.events.size() << '\n';
-    std::cout << "Telemetry window rows: " << validation.windowDataset.rows.size() << '\n';
-    std::cout << "Hybrid result rows: " << validation.hybridResult.labels.size() << '\n';
 
+    const auto& summary = validation.summary;
+    std::cout << "Validation algorithm: " << summary.algorithm << '\n'
+              << "Validation window: " << summary.windowType << '\n'
+              << "Threshold: " << summary.threshold << '\n'
+              << "Total rows: " << summary.totalRows << '\n'
+              << "is_failure == 1: " << summary.totalFailureRows << '\n'
+              << "Valid failure rows: " << summary.validFailureRows << '\n'
+              << "Skipped failure rows: " << summary.skippedFailureRows << '\n'
+              << "Skipped reasons: missing timestamp=" << summary.missingTimestamp
+              << ", missing host/GPU=" << summary.missingHostOrGpu
+              << ", missing required features=" << summary.missingRequiredFeatures
+              << ", non-finite=" << summary.nonFiniteNumericValues << '\n'
+              << "Processed events: " << summary.processedEvents << '\n'
+              << "Positive: " << summary.positiveCount << '\n'
+              << "Negative: " << summary.negativeCount << '\n'
+              << "Detection rate: " << std::fixed << std::setprecision(4) << summary.detectionRate << '\n'
+              << "Lead time for positives: " << summary.leadTimeSeconds << " sec\n"
+              << "Mean score positive: " << summary.meanScorePositive << '\n'
+              << "Mean score negative: " << summary.meanScoreNegative << '\n'
+              << "proxy_used: " << summary.proxyUsed << '\n';
+
+    std::cout << "Telemetry rows used by detector: " << validation.windowDataset.rows.size() << '\n';
+    std::cout << "Validation result rows: " << validation.hybridResult.labels.size() << '\n';
     const std::size_t anomalies = std::count(validation.hybridResult.labels.begin(), validation.hybridResult.labels.end(), 1);
-    std::cout << "Hybrid anomalies: " << anomalies << '\n';
+    std::cout << "Validation anomalies: " << anomalies << '\n';
 
-    bool hasPositiveLeadTime = false;
+    std::cout << "\nhost,gpu,failure_time,window_type,threshold,detection_time,lead_time_sec,positive,algorithm_detected,if_score,if_detected,hybrid_detected\n";
     for (const auto& item : validation.leadTimes) {
-        hasPositiveLeadTime = hasPositiveLeadTime || item.positive;
-        std::cout << "host=" << item.hostname
-                  << " detection=" << item.detectionTimestamp
-                  << " error=" << item.errorTimestamp
-                  << " lead_time_sec=" << item.leadTimeSeconds
-                  << " positive=" << yesNo(item.positive) << '\n';
+        std::cout << item.hostname << ','
+                  << item.gpu << ','
+                  << item.errorTimestamp << ','
+                  << item.windowType << ','
+                  << item.threshold << ','
+                  << item.detectionTimestamp << ','
+                  << item.leadTimeSeconds << ','
+                  << yesNo(item.positive) << ','
+                  << yesNo(item.algorithmDetected) << ','
+                  << item.ifScore << ','
+                  << yesNo(item.ifDetected) << ','
+                  << yesNo(item.hybridDetected) << '\n';
     }
-    if (!hasPositiveLeadTime) {
-        std::cout << "No positive lead time was confirmed for is_failure rows.\n";
-        return 3;
+
+    if (summary.positiveCount == 0) {
+        std::cout << "No positive lead time was confirmed for is_failure rows. This is an honest negative validation result, not a runtime error.\n";
     }
     return 0;
 }

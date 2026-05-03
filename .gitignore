@@ -20,3 +20,5 @@ anomaly_results_export.csv
 telemetry_plot_series.csv
 telemetry_plot.png
 postgres_data/
+second_dataset/failures.csv
+second_dataset/points_with_jobs_tele_ult.csv

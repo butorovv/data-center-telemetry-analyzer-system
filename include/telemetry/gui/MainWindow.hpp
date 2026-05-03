@@ -36,6 +36,7 @@ private slots:
     void startValidation();
     void cancelCurrentOperation();
     void exportResultsCsv();
+    void exportValidationCsv();
     void centerChartOnSelectedRow(const QModelIndex& index);
 
 private:
@@ -52,8 +53,10 @@ private:
                       const QString& algorithm, bool isAnomaly, double score);
     void resetChartData(const QString& metricName);
     void addChartPoint(int rawIndex, const QString& timestamp, double value, bool isAnomaly);
-    void addLeadTimeRow(const QString& hostname, const QString& detection,
-                        const QString& error, double leadTimeSeconds, bool positive);
+    void addLeadTimeRow(const QString& hostname, int gpu, const QString& failureTimestamp,
+                        const QString& windowType, double threshold, const QString& detectionTimestamp,
+                        double leadTimeSeconds, bool positive, bool algorithmDetected,
+                        double ifScore, bool ifDetected, bool hybridDetected);
     void rebuildChart(int centerRawIndex = -1);
 
     QLineEdit* inputPathEdit_ = nullptr;
@@ -63,6 +66,8 @@ private:
     QLineEdit* validationTelemetryPathEdit_ = nullptr;
     QLineEdit* locationsPathEdit_ = nullptr;
     QComboBox* algorithmCombo_ = nullptr;
+    QComboBox* validationAlgorithmCombo_ = nullptr;
+    QComboBox* validationWindowCombo_ = nullptr;
     QDoubleSpinBox* thresholdSpin_ = nullptr;
     QProgressBar* progressBar_ = nullptr;
     QPushButton* cancelButton_ = nullptr;
@@ -79,6 +84,7 @@ private:
     QTabWidget* tabs_ = nullptr;
 
     QString chartMetricName_;
+    QString chartXAxisTitle_ = QStringLiteral("raw_id");
     QVector<int> chartRawIndices_;
     QVector<QString> chartTimestamps_;
     QVector<double> chartValues_;
@@ -87,4 +93,3 @@ private:
 };
 
 } // namespace telemetry::gui
-
