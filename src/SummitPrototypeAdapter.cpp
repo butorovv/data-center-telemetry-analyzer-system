@@ -483,6 +483,8 @@ DetectorResult SummitPrototypeAdapter::runHybrid(
     DetectorResult iforest = isolationForestResult(data, options);
     DetectorResult result = makeResultHeader("hybrid_iforest_graph", data);
     result.threshold = iforest.threshold;
+    // Keep the original Isolation Forest score; graph verification only changes the final label.
+    result.scores = iforest.scores;
 
     std::unordered_set<std::string> candidateHostTimes;
     const std::size_t rows = std::min(dataset.rows.size(), iforest.labels.size());
@@ -504,7 +506,6 @@ DetectorResult SummitPrototypeAdapter::runHybrid(
             const std::string& neighborHostname = graph.hosts[neighbor];
             if (candidateHostTimes.find(hostTimeKey(neighborHostname, dataset.rows[row].timestamp)) != candidateHostTimes.end()) {
                 result.labels[row] = 1;
-                result.scores[row] = iforest.scores[row];
                 break;
             }
         }

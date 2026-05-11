@@ -26,7 +26,8 @@ DetectorResult HybridDetector::verifyWithGraph(
     result.algorithm = "hybrid_iforest_graph";
     result.rowIds = isolationForestResult.rowIds;
     result.labels.assign(isolationForestResult.labels.size(), 0);
-    result.scores.assign(isolationForestResult.scores.size(), 0.0);
+    // Keep the original Isolation Forest score; graph verification only changes the final label.
+    result.scores = isolationForestResult.scores;
     result.threshold = isolationForestResult.threshold;
 
     const std::size_t rows = std::min(dataset.rows.size(), isolationForestResult.labels.size());
@@ -83,7 +84,6 @@ DetectorResult HybridDetector::verifyWithGraph(
         }
 
         result.labels[i] = verified ? 1 : 0;
-        result.scores[i] = verified ? isolationForestResult.scores[i] : isolationForestResult.scores[i] * 0.5;
     }
 
     const auto finished = std::chrono::steady_clock::now();
